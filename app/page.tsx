@@ -1,4 +1,4 @@
-import { NavBar } from "@/components/navbar"; // ADDED IMPORT
+import { NavBar } from "@/components/navbar";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ExperienceSection } from "@/components/sections/experience-section";
 import { ProjectsSection } from "@/components/sections/projects-section";
@@ -9,13 +9,13 @@ import { ContactSection } from "@/components/sections/contact-section";
 
 export default function PortfolioPage() {
   return (
-    <main className="min-h-screen bg-zinc-950 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] text-zinc-300 font-sans selection:bg-cyan-500/30">
+    // Restored min-h-screen for natural scrolling. Green grid lines retained.
+    <main className="min-h-screen bg-zinc-50 bg-[linear-gradient(to_right,rgba(34,197,94,0.25)_1px,transparent_1px),linear-gradient(to_bottom,rgba(34,197,94,0.25)_1px,transparent_1px)] bg-[size:14px_24px] text-zinc-900 font-sans selection:bg-cyan-500/30">
       
-      {/* INJECTED NAVBAR HERE */}
       <NavBar /> 
 
-      {/* Added pt-16 to the wrapper to account for the fixed navbar height */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-24 py-12 pt-16">
+      {/* Kept the larger left/right padding and removed tight constraints that break scrolling */}
+      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 flex flex-col pt-16">
         <HeroSection />
         <ExperienceSection />
         <ProjectsSection />
