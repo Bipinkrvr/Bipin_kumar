@@ -64,8 +64,8 @@ export function ProjectsSection() {
   ];
 
   return (
-    // Hard-locked height, no scrolling allowed.
-    <section id="projects" className="w-full min-h-screen flex flex-col items-center justify-center relative py-16 px-2 sm:px-8 bg-transparent">
+    // FIX APPLIED: Removed min-h-screen and changed py-16 to py-12 sm:py-20 to stop mobile layout shifts (jerks)
+    <section id="projects" className="w-full flex flex-col items-center justify-center relative py-12 sm:py-20 px-2 sm:px-8 bg-transparent">
       
       {/* Super Compact Header */}
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-end justify-between mb-2 border-b border-zinc-300 pb-1.5 gap-2 w-full shrink-0">
@@ -115,9 +115,6 @@ export function ProjectsSection() {
           </div>
         </div>
 
-        {/* FIX APPLIED: grid-cols-1 (mobile) to lg:grid-cols-2 (desktop). 
-          This perfectly aligns the 5 items into 3 rows without any scrolling required. 
-        */}
         <div className="flex-grow p-2 sm:p-4 bg-zinc-100 grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 relative z-10 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] content-start min-h-0">
           {projects.map((mod) => {
             const Icon = mod.icon;

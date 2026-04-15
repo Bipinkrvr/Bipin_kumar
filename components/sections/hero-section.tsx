@@ -14,10 +14,45 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section id="hero" className="relative w-full min-h-[100svh] flex items-center justify-center p-2 sm:p-4 md:p-6 pt-16 sm:pt-20 overflow-visible bg-transparent">
+    <section id="hero" className="relative w-full min-h-[100svh] flex items-center justify-center p-2 sm:p-4 md:p-6 pt-2 sm:pt-10 overflow-visible bg-transparent">
       
       <div className="w-full max-w-6xl flex flex-col relative z-10 h-auto sm:h-[85vh]">
         
+        {/* DESKTOP POWER ASSEMBLY (Hidden on Mobile) */}
+        <div className="hidden sm:flex absolute top-[60%] -left-[70px] md:-left-[90px] lg:-left-[120px] flex-row items-center z-[-1] drop-shadow-md">
+           
+           {/* DC Power Supply Box */}
+           <div className="w-14 h-16 lg:w-16 lg:h-16 bg-zinc-100 border-2 border-zinc-300 rounded-md flex flex-col items-center justify-center relative z-20 shadow-[inset_0_0_10px_rgba(0,0,0,0.05),-5px_5px_15px_rgba(0,0,0,0.1)]">
+              {/* DC Rating Label */}
+              <div className="flex flex-col items-center justify-center mb-1">
+                 <span className="font-mono text-[16px] lg:text-[18px] font-black text-zinc-400 leading-none">DC</span>
+                 <span className="font-mono text-[7px] lg:text-[8px] font-bold text-zinc-500 mt-0.5 tracking-wider">24V 5A</span>
+              </div>
+              {/* Power Indicator */}
+              <div className="absolute bottom-1 lg:bottom-1.5 flex items-center gap-1">
+                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${isStable ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)] animate-pulse'}`}></div>
+                <span className={`text-[4px] lg:text-[5px] font-mono font-bold ${isStable ? 'text-zinc-500' : 'text-red-500'}`}>
+                   {isStable ? '24V' : 'BOOT'}
+                </span>
+              </div>
+           </div>
+
+           {/* Plug (Sinks into the socket via translate-x) */}
+           <div className="w-6 h-8 lg:w-8 lg:h-10 bg-zinc-300 border-2 border-zinc-400 border-l-0 rounded-r-md flex flex-col items-start justify-center pl-1 shadow-md relative z-10 translate-x-[-4px]">
+              {/* Grip Lines */}
+              <div className="w-[1px] h-3 lg:h-4 bg-zinc-500 mb-[2px]"></div>
+              <div className="w-[1px] h-3 lg:h-4 bg-zinc-500 mb-[2px]"></div>
+              <div className="w-[1px] h-3 lg:h-4 bg-zinc-500"></div>
+           </div>
+
+           {/* Wire going to chassis back (Negative margin-left ensures it penetrates the plug) */}
+           <svg width="45" height="20" viewBox="0 0 45 20" className="opacity-90 -ml-[6px]">
+              <path d="M 0 10 L 45 10" fill="none" stroke="#27272a" strokeWidth="6" />
+              <path d="M 0 10 L 45 10" fill="none" stroke="#52525b" strokeWidth="2" />
+           </svg>
+        </div>
+
+
         {/* Top DIN Rail */}
         <div aria-hidden="true" className="w-[90%] mx-auto h-3 sm:h-4 bg-zinc-300 border-x-4 border-t-4 border-zinc-400 rounded-t-lg flex justify-between items-center px-4 sm:px-12 shadow-sm shrink-0 z-0">
            <div className="w-8 sm:w-12 h-1 bg-zinc-400 rounded-full shadow-inner border border-zinc-300"></div>
@@ -190,9 +225,7 @@ export function HeroSection() {
                     <Database className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> RECORDS
                   </Link>
                 </div>
-
               </div>
-
             </div>
           </div>
         </div>
@@ -201,6 +234,39 @@ export function HeroSection() {
         <div aria-hidden="true" className="w-[60%] mx-auto h-4 sm:h-5 bg-zinc-300 border-x-4 border-b-4 border-zinc-400 rounded-b-md relative flex items-center justify-center shadow-sm shrink-0 z-0">
           <div className="absolute inset-x-0 h-1.5 sm:h-2 bg-zinc-200 top-1/2 -translate-y-1/2 border-y border-zinc-300 shadow-inner"></div>
           <div className="px-2 sm:px-3 py-0.5 bg-white border border-zinc-300 text-[5px] sm:text-[7px] font-mono text-zinc-500 z-10 rounded-sm shadow-sm flex truncate max-w-[90%]">MOUNTING_RAIL: DIN_EN_50022</div>
+        </div>
+
+        {/* MOBILE POWER ASSEMBLY (Hidden on Desktop) */}
+        <div className="flex sm:hidden flex-col items-center mt-[-4px] relative z-[-1] shrink-0">
+           {/* SVG Vertical Wire (Negative margin-bottom ensures it penetrates the plug) */}
+           <svg width="20" height="35" viewBox="0 0 20 35" className="opacity-90 -mb-[6px]">
+              <path d="M 10 0 L 10 35" fill="none" stroke="#27272a" strokeWidth="6" />
+              <path d="M 10 0 L 10 35" fill="none" stroke="#52525b" strokeWidth="2" />
+           </svg>
+           
+           {/* Plug (Sinks into the socket via translate-y) */}
+           <div className="w-8 h-6 bg-zinc-300 border-2 border-zinc-400 border-b-0 rounded-t-md flex flex-col items-center justify-start pt-[3px] shadow-md relative z-10 translate-y-[4px]">
+              {/* Grip lines */}
+              <div className="w-4 h-[1px] bg-zinc-500 mb-[2px]"></div>
+              <div className="w-4 h-[1px] bg-zinc-500 mb-[2px]"></div>
+              <div className="w-4 h-[1px] bg-zinc-500"></div>
+           </div>
+           
+           {/* DC Power Supply Box */}
+           <div className="w-16 h-16 bg-zinc-100 border-2 border-zinc-300 rounded-md shadow-inner flex flex-col items-center justify-center relative z-20">
+              {/* DC Rating Label */}
+              <div className="flex flex-col items-center justify-center mb-1">
+                 <span className="font-mono text-[16px] font-black text-zinc-400 leading-none">DC</span>
+                 <span className="font-mono text-[7px] font-bold text-zinc-500 mt-0.5 tracking-wider">24V 5A</span>
+              </div>
+              {/* Dynamic Power Indicator */}
+              <div className="absolute bottom-1.5 flex items-center gap-1">
+                <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${isStable ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]' : 'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)] animate-pulse'}`}></div>
+                <span className={`text-[5px] font-mono font-bold ${isStable ? 'text-zinc-500' : 'text-red-500'}`}>
+                   {isStable ? '24V' : 'BOOT'}
+                </span>
+              </div>
+           </div>
         </div>
 
       </div>
