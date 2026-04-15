@@ -6,6 +6,7 @@ import { SkillsSection } from "@/components/sections/subsystems-section";
 import { EducationSection } from "@/components/sections/education-section";
 import { AchievementsSection } from "@/components/sections/achievements-section";
 import { ContactSection } from "@/components/sections/contact-section";
+import { InternshipSection } from "@/components/sections/internship-section";
 
 export default function PortfolioPage() {
   return (
@@ -18,6 +19,7 @@ export default function PortfolioPage() {
       <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 flex flex-col pt-16">
         <HeroSection />
         <ExperienceSection />
+        <InternshipSection />
         <ProjectsSection />
         <SkillsSection />
         <EducationSection />
