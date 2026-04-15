@@ -132,13 +132,11 @@ export function EducationSection() {
                <div className={`absolute top-1/2 left-[50%] right-[-17px] h-[4px] -translate-y-1/2 ${posWire}`}></div>
                
                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 ${motorChassis}`}>
-                  {/* FIX: Wrapper DIV prevents React from clobbering inline style transforms when classes change */}
                   <div ref={el => { fanRefs.current[0] = el }} className="w-full h-full flex items-center justify-center">
                      <Fan className={`w-16 h-16 ${motorIcon}`} />
                   </div>
                   <div className="absolute w-5 h-5 bg-zinc-100 rounded-full border-2 border-zinc-200 z-10"></div>
                </div>
-               {/* Motor Rating */}
                <span className="absolute -top-3 -left-6 text-[10px] font-mono font-bold text-zinc-500 tracking-wider bg-white/90 px-1 border border-zinc-200 rounded whitespace-nowrap z-40 shadow-sm">BLDC_24V_3000RPM</span>
             </div>
 
@@ -191,7 +189,6 @@ export function EducationSection() {
                   onMouseEnter={() => { if(window.innerWidth >= 768) setIsHovered(true) }}
                   onMouseLeave={() => { if(window.innerWidth >= 768) setIsHovered(false) }}
                 >
-                   {/* Positive Terminal & Upward Penetrating Wire */}
                    <div className={`absolute top-0 left-1/2 -translate-x-[2px] w-[4px] h-[16px] ${posWire}`}></div>
                    <div className={`relative w-20 h-3.5 mx-auto flex items-center justify-center rounded-t-md border-t border-x z-20 shadow-sm transition-all duration-1000 ${theme.termBg} ${theme.termBorder}`}>
                      <span className="text-[11px] font-black text-zinc-600">+</span>
@@ -230,7 +227,6 @@ export function EducationSection() {
                      </div>
                    </Card>
 
-                   {/* Negative Terminal & Downward Penetrating Wire */}
                    <div className={`relative w-20 h-3.5 mx-auto flex items-center justify-center rounded-b-md border-b border-x z-20 shadow-sm transition-all duration-1000 bg-zinc-300 border-zinc-400`}>
                      <span className="text-[11px] font-black text-zinc-100">-</span>
                    </div>
@@ -262,26 +258,26 @@ export function EducationSection() {
         {/* ======================================================== */}
         <div className="md:hidden relative w-full max-w-[400px] mx-auto px-4 sm:px-8 py-2 flex flex-col gap-10">
           
-          {/* Main Vertical Bus Bars (z-20 brings them in front of the horizontal wires) */}
-          <div className={`absolute left-4 sm:left-8 top-8 bottom-8 w-[4px] rounded-none z-20 ${negWire}`}></div>
-          <div className={`absolute right-4 sm:right-8 top-8 bottom-8 w-[4px] rounded-none z-20 ${posWire}`}></div>
-
           {/* Top Section: Fan and MCB */}
-          <div className="flex justify-between items-center relative z-20 w-full">
+          <div className="flex justify-between items-center relative w-full">
              
-             {/* FIX: -ml-2 stretches the wire perfectly UNDER the z-20 vertical bus bar */}
-             <div className={`h-[4px] flex-grow -ml-2 z-10 ${negWire}`}></div>
+             {/* Left Vertical Start (Motor Corner -> Down) */}
+             <div className={`absolute left-0 top-[calc(50%-2px)] w-[4px] h-[calc(50%+42px)] z-20 rounded-none ${negWire}`}></div>
+             
+             {/* Right Vertical Start (MCB Corner -> Down) */}
+             <div className={`absolute right-0 top-[calc(50%-2px)] w-[4px] h-[calc(50%+42px)] z-20 rounded-none ${posWire}`}></div>
+
+             {/* Horizontal Motor Line */}
+             <div className={`h-[4px] flex-grow z-10 ${negWire}`}></div>
 
              {/* The Fan */}
-             <div className="relative flex items-center justify-center">
+             <div className="relative flex items-center justify-center z-20">
                 <div className={`relative w-20 h-20 ${motorChassis}`}>
-                  {/* FIX: Wrapper DIV preserves rotation state */}
                   <div ref={el => { fanRefs.current[1] = el }} className="w-full h-full flex items-center justify-center">
                     <Fan className={`w-10 h-10 ${motorIcon}`} />
                   </div>
                   <div className="absolute w-3 h-3 bg-zinc-100 rounded-full border-2 border-zinc-200 z-10"></div>
                 </div>
-                {/* Motor Rating Mobile */}
                 <span className="absolute -top-6 -left-1 text-[8px] font-mono font-bold text-zinc-500 tracking-wider bg-white px-1 border border-zinc-200 rounded shadow-sm z-40 whitespace-nowrap">BLDC_24V_3000RPM</span>
              </div>
 
@@ -308,20 +304,28 @@ export function EducationSection() {
                 </div>
              </div>
 
-             {/* FIX: -mr-2 stretches the wire perfectly UNDER the z-20 vertical bus bar */}
-             <div className={`h-[4px] flex-grow -mr-2 z-10 ${posWire}`}></div>
+             {/* Horizontal MCB Line */}
+             <div className={`h-[4px] flex-grow z-10 ${posWire}`}></div>
           </div>
 
-          {/* Battery Stack (Horizontal Card Design for Mobile) */}
-          <div className="flex flex-col gap-6 w-full z-20">
+          {/* Battery Stack */}
+          <div className="flex flex-col gap-10 w-full">
              {education.map((edu, idx) => {
                const theme = isCircuitActive ? edu.active : edu.inactive;
+               const isLast = idx === education.length - 1;
 
                return (
                 <div key={`mob-${idx}`} className="flex items-stretch w-full relative">
                    
-                   {/* FIX: -ml-2 stretches the wire perfectly UNDER the z-20 vertical bus bar */}
-                   <div className={`h-[4px] self-center flex-grow -ml-2 z-10 ${negWire}`}></div>
+                   {/* Left Vertical Segments */}
+                   {/* 1. Top half (connects from gap above down to horizontal wire) */}
+                   <div className={`absolute left-0 top-0 w-[4px] h-[calc(50%+2px)] z-20 rounded-none ${negWire}`}></div>
+                   {/* 2. Bottom half (bridges the gap down to the NEXT element, omitted if it's the last item!) */}
+                   {!isLast && (
+                      <div className={`absolute left-0 top-[calc(50%-2px)] w-[4px] h-[calc(50%+42px)] z-20 rounded-none ${negWire}`}></div>
+                   )}
+                   
+                   <div className={`h-[4px] self-center flex-grow z-10 ${negWire}`}></div>
                    
                    {/* Negative Terminal */}
                    <div className="w-5 sm:w-6 flex items-center justify-center rounded-l-md border z-30 shadow-sm relative bg-zinc-300 border-zinc-400">
@@ -360,8 +364,13 @@ export function EducationSection() {
                       <span className="text-xs font-black text-zinc-600">+</span>
                    </div>
 
-                   {/* FIX: -mr-2 stretches the wire perfectly UNDER the z-20 vertical bus bar */}
-                   <div className={`h-[4px] self-center flex-grow -mr-2 z-10 ${posWire}`}></div>
+                   <div className={`h-[4px] self-center flex-grow z-10 ${posWire}`}></div>
+
+                   {/* Right Vertical Segments */}
+                   <div className={`absolute right-0 top-0 w-[4px] h-[calc(50%+2px)] z-20 rounded-none ${posWire}`}></div>
+                   {!isLast && (
+                      <div className={`absolute right-0 top-[calc(50%-2px)] w-[4px] h-[calc(50%+42px)] z-20 rounded-none ${posWire}`}></div>
+                   )}
                 </div>
                );
              })}
