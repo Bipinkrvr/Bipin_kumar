@@ -3,13 +3,26 @@
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Cpu, Terminal, Database, Code2, Zap } from "lucide-react";
+import { 
+  // Main Category Icons
+  Cpu, Database, Code2, Zap, Lightbulb,
+  // Core Electrical Icons
+  PenTool, Settings, GitMerge, Calculator, Factory,
+  // Hardware & IoT Icons
+  Network, Server, Plug, Radio,
+  // Data & Analytics Icons
+  BarChart, LineChart, Activity, LayoutDashboard, TrendingUp,
+  // Cloud & Architecture Icons
+  Sparkles, Layers, Cloud, Braces, Monitor,
+  // Strategic Leadership Icons
+  Puzzle, Users, Flag, Mic, Target
+} from "lucide-react";
 
 const subsystems = [
   {
     id: "card-amber",
-    title: "Hardware_&_IoT",
-    icon: Cpu,
+    title: "Core_Electrical",
+    icon: Zap,
     theme: {
       color: "amber",
       text: "text-amber-600",
@@ -22,14 +35,20 @@ const subsystems = [
       wire: "bg-amber-400",
       svgStroke: "stroke-amber-500",
       svgFill: "fill-amber-500",
-      svgGlow: "drop-shadow-[0_0_4px_rgba(245,158,11,0.4)]",
+      svgGlow: "drop-shadow-[0_0_4px_rgba(245,158,11,0.6)]", // Increased glow slightly
     },
-    skills: ["ESP32 Microcontrollers", "Embedded C++", "Termux Upcycling", "Sensors (DHT11)"],
+    skills: [
+      { name: "AutoCAD Electrical", icon: PenTool }, 
+      { name: "PLC Programming", icon: Settings }, 
+      { name: "Ladder Logic", icon: GitMerge }, 
+      { name: "MATLAB", icon: Calculator }, 
+      { name: "Industrial Auto", icon: Factory }
+    ],
   },
   {
     id: "card-cyan",
-    title: "Client_Architecture",
-    icon: Terminal,
+    title: "Hardware_&_IoT",
+    icon: Cpu,
     theme: {
       color: "cyan",
       text: "text-cyan-600",
@@ -42,13 +61,19 @@ const subsystems = [
       wire: "bg-cyan-400",
       svgStroke: "stroke-cyan-500",
       svgFill: "fill-cyan-500",
-      svgGlow: "drop-shadow-[0_0_4px_rgba(34,211,238,0.4)]",
+      svgGlow: "drop-shadow-[0_0_4px_rgba(34,211,238,0.6)]",
     },
-    skills: ["React 19", "Next.js 15", "Flutter", "Tailwind CSS"],
+    skills: [
+      { name: "IoT Architecture", icon: Network }, 
+      { name: "ESP32 & Arduino", icon: Cpu }, 
+      { name: "Edge Computing", icon: Server }, 
+      { name: "Hardware Integration", icon: Plug }, 
+      { name: "Real-Time Telemetry", icon: Radio }
+    ],
   },
   {
     id: "card-emerald",
-    title: "Server_&_Database",
+    title: "Data_&_Analytics",
     icon: Database,
     theme: {
       color: "emerald",
@@ -62,13 +87,19 @@ const subsystems = [
       wire: "bg-emerald-400",
       svgStroke: "stroke-emerald-500",
       svgFill: "fill-emerald-500",
-      svgGlow: "drop-shadow-[0_0_4px_rgba(16,185,129,0.4)]",
+      svgGlow: "drop-shadow-[0_0_4px_rgba(16,185,129,0.6)]",
     },
-    skills: ["Node.js", "Express.js", "MongoDB", "Firebase"],
+    skills: [
+      { name: "Power BI & DAX", icon: BarChart }, 
+      { name: "Data Visualization", icon: LineChart }, 
+      { name: "Data Telemetry", icon: Activity }, 
+      { name: "Dashboard Design", icon: LayoutDashboard }, 
+      { name: "Predictive Analytics", icon: TrendingUp }
+    ],
   },
   {
     id: "card-purple",
-    title: "Core_Engineering",
+    title: "Cloud_&_Architecture",
     icon: Code2,
     theme: {
       color: "purple",
@@ -82,16 +113,47 @@ const subsystems = [
       wire: "bg-purple-400",
       svgStroke: "stroke-purple-500",
       svgFill: "fill-purple-500",
-      svgGlow: "drop-shadow-[0_0_4px_rgba(168,85,247,0.4)]",
+      svgGlow: "drop-shadow-[0_0_4px_rgba(168,85,247,0.6)]",
     },
-    skills: ["Power Electronics", "Synchronous Machines", "Control Systems", "ZPF Methods"],
+    skills: [
+      { name: "AI Prototyping", icon: Sparkles }, 
+      { name: "System Architecture", icon: Layers }, 
+      { name: "Cloud (Firebase)", icon: Cloud }, 
+      { name: "API Design", icon: Braces }, 
+      { name: "IoT Dashboards", icon: Monitor }
+    ],
+  },
+  {
+    id: "card-rose",
+    title: "Strategic_Leadership",
+    icon: Lightbulb,
+    theme: {
+      color: "rose",
+      text: "text-rose-600",
+      border: "border-rose-400",
+      shadow: "shadow-[0_4px_20px_rgba(244,63,94,0.15)]",
+      pin: "bg-rose-400 shadow-[0_0_5px_rgba(244,63,94,0.5)]",
+      led: "bg-rose-500",
+      badgeText: "text-rose-700",
+      badgeBorder: "border-rose-300",
+      wire: "bg-rose-400",
+      svgStroke: "stroke-rose-500",
+      svgFill: "fill-rose-500",
+      svgGlow: "drop-shadow-[0_0_4px_rgba(244,63,94,0.6)]",
+    },
+    skills: [
+      { name: "Problem Solving", icon: Puzzle }, 
+      { name: "Cross-Functional", icon: Users }, 
+      { name: "Project Leadership", icon: Flag }, 
+      { name: "Public Speaking", icon: Mic }, 
+      { name: "Strategy", icon: Target }
+    ],
   },
 ];
 
 export function SkillsSection() {
   const [activeCards, setActiveCards] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
-  // Track which cards have been auto-revealed to prevent them from toggling randomly during scroll
   const revealedCards = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -106,7 +168,7 @@ export function SkillsSection() {
         setIsMobile(mobile);
         if (!mobile) {
           setActiveCards([]); 
-          revealedCards.current.clear(); // Reset memory on desktop
+          revealedCards.current.clear();
         }
       }
     };
@@ -116,17 +178,14 @@ export function SkillsSection() {
 
     window.addEventListener("resize", handleResize);
 
-    // FIX: Intersection Observer for Mobile Auto-Scroll Animation
     const observer = new IntersectionObserver(
       (entries) => {
-        // Only run the observer logic on mobile
         if (window.innerWidth >= 768) return;
 
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.getAttribute("data-id");
             if (id && !revealedCards.current.has(id)) {
-              // Mark it as revealed so we don't force it ON again if the user manually turned it OFF
               revealedCards.current.add(id);
               setActiveCards((prev) => {
                 if (!prev.includes(id)) return [...prev, id];
@@ -136,7 +195,7 @@ export function SkillsSection() {
           }
         });
       },
-      { threshold: 0.5 } // Triggers when the card is 50% visible on screen
+      { threshold: 0.95 } 
     );
 
     document.querySelectorAll(".subsystem-card").forEach((card) => {
@@ -158,6 +217,7 @@ export function SkillsSection() {
     if (activeColor === 'cyan') return "border-cyan-400 shadow-[0_4px_15px_rgba(34,211,238,0.15)]";
     if (activeColor === 'emerald') return "border-emerald-400 shadow-[0_4px_15px_rgba(16,185,129,0.15)]";
     if (activeColor === 'purple') return "border-purple-400 shadow-[0_4px_15px_rgba(168,85,247,0.15)]";
+    if (activeColor === 'rose') return "border-rose-400 shadow-[0_4px_15px_rgba(244,63,94,0.15)]";
     return "border-zinc-300 shadow-sm"; 
   };
 
@@ -166,18 +226,17 @@ export function SkillsSection() {
     if (activeColor === 'cyan') return "bg-cyan-400";
     if (activeColor === 'emerald') return "bg-emerald-400";
     if (activeColor === 'purple') return "bg-purple-400";
+    if (activeColor === 'rose') return "bg-rose-400";
     return "bg-zinc-300"; 
   };
 
   return (
-    // FIX: Removed min-h-[100svh] and added padding (py-12 sm:py-20) to eliminate scroll jerks
     <section id="skills" className="w-full flex flex-col justify-center relative py-12 sm:py-20 px-4 sm:px-8 overflow-hidden bg-transparent">
       <div className="w-full max-w-4xl mx-auto flex items-center gap-3 mb-6 border-b border-zinc-200 pb-3">
         <Code2 className="w-6 h-6 text-cyan-600" />
         <h2 className="text-xl sm:text-2xl font-mono font-bold text-zinc-800 tracking-wider">
-          [SUBSYSTEMS_TOOLKIT]
+          [CORE_SKILLS_MATRIX]
         </h2>
-        {/* REMOVED: Tap to Switch badge has been removed as requested */}
       </div>
 
       <div className="relative mt-2 mb-6 w-full max-w-4xl mx-auto">
@@ -206,14 +265,14 @@ export function SkillsSection() {
               <div 
                 key={idx} 
                 data-id={system.id}
-                onMouseEnter={() => !isMobile && setActiveCards([system.id])} // Desktop Hover ON
-                onMouseLeave={() => !isMobile && setActiveCards([])}          // Desktop Hover OFF
+                onMouseEnter={() => !isMobile && setActiveCards([system.id])}
+                onMouseLeave={() => !isMobile && setActiveCards([])}
                 onClick={() => {
                   if (isMobile) {
                     setActiveCards((prev) => 
                       prev.includes(system.id) 
-                        ? prev.filter((id) => id !== system.id) // Mobile Tap OFF
-                        : [...prev, system.id]                  // Mobile Tap ON
+                        ? prev.filter((id) => id !== system.id)
+                        : [...prev, system.id]
                     );
                   }
                 }}
@@ -293,16 +352,21 @@ export function SkillsSection() {
                   </CardHeader>
                   
                   <CardContent className="px-4 sm:px-5 pb-5">
-                    <div className="flex flex-wrap gap-1.5 pt-1 pointer-events-none">
-                      {system.skills.map((skill, skillIdx) => (
-                        <Badge 
-                          key={skillIdx} 
-                          variant="secondary" 
-                          className={`bg-zinc-50 border font-mono text-[10px] sm:text-xs transition-colors duration-75 ${isActive ? `${system.theme.badgeBorder} ${system.theme.badgeText}` : 'border-zinc-200 text-zinc-600'}`}
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
+                    <div className="flex flex-wrap gap-2 pt-1 pointer-events-none">
+                      {system.skills.map((skill, skillIdx) => {
+                        const SkillIcon = skill.icon;
+                        return (
+                          <Badge 
+                            key={skillIdx} 
+                            variant="secondary" 
+                            className={`flex items-center gap-1.5 bg-zinc-50 border font-mono px-2 py-1 text-[10px] sm:text-xs transition-colors duration-75 ${isActive ? `${system.theme.badgeBorder} ${system.theme.badgeText}` : 'border-zinc-200 text-zinc-600'}`}
+                          >
+                            {/* THE ALWAYS-LIGHTED ICON */}
+                            <SkillIcon className={`w-3 h-3 ${system.theme.text} ${system.theme.svgGlow}`} />
+                            {skill.name}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </CardContent>
 

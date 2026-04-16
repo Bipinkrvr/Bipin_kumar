@@ -7,9 +7,9 @@ import Link from "next/link";
 import { 
   ArrowLeft, FileText, Github, Activity, 
   Terminal, ShieldAlert, Cpu, Settings, ChevronLeft, ChevronRight, Linkedin, Maximize,
-  Zap, CircuitBoard, PlugZap
+  Zap, CircuitBoard, PlugZap, ExternalLink
 } from "lucide-react";
-import { projectsData, ProjectMedia } from "@/lib/projects-data"; 
+import { projectsData } from "@/lib/projects-data"; 
 
 const getYouTubeEmbedUrl = (url: string) => {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -20,7 +20,7 @@ const getYouTubeEmbedUrl = (url: string) => {
   return url;
 };
 
-// --- UPDATED: Wires Extended Off-Screen and Heavily Populated Right Side ---
+// --- Wires Extended Off-Screen and Heavily Populated Right Side ---
 const CleanWireBackground = () => (
   <div className="fixed top-0 left-0 w-full h-[100svh] pointer-events-none z-0 overflow-hidden bg-[#f4f4f5]">
     {/* Base Schematic Grid */}
@@ -69,16 +69,19 @@ const MountingHole = ({ className }: { className: string }) => (
 export default function SCADAProjectPage() {
   const params = useParams();
   const router = useRouter();
-  const id = typeof params.id === "string" ? params.id : "MOD_01";
+  const id = typeof params.id === "string" ? params.id : "";
   
-  const project = projectsData[id as keyof typeof projectsData] || projectsData["MOD_01"];
+  // Find the project based on the array structure, fallback to first project if not found
+  const project = projectsData.find((p) => p.id === id) || projectsData[0];
   
   const [sysTime, setSysTime] = useState("");
   const [currentMedia, setCurrentMedia] = useState(0);
   const mediaContainerRef = useRef<HTMLDivElement>(null);
 
+  // Safe media checking
   const sortedMediaList = useMemo(() => {
-    const media = project.media || [];
+    // @ts-expect-error - Handling cases where media might not exist on the simplified object
+    const media: any[] = project.media || [];
     return [...media].sort((a, b) => {
       const aIsVideo = a.type === 'video' || a.type === 'youtube';
       const bIsVideo = b.type === 'video' || b.type === 'youtube';
@@ -86,7 +89,7 @@ export default function SCADAProjectPage() {
       if (!aIsVideo && bIsVideo) return 1;
       return 0;
     });
-  }, [project.media]);
+  }, [project]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -96,8 +99,8 @@ export default function SCADAProjectPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const nextMedia = () => setCurrentMedia((prev) => (prev + 1) % sortedMediaList.length);
-  const prevMedia = () => setCurrentMedia((prev) => (prev - 1 + sortedMediaList.length) % sortedMediaList.length);
+  const nextMedia = () => setCurrentMedia((prev) => (prev + 1) % Math.max(1, sortedMediaList.length));
+  const prevMedia = () => setCurrentMedia((prev) => (prev - 1 + sortedMediaList.length) % Math.max(1, sortedMediaList.length));
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -129,7 +132,7 @@ export default function SCADAProjectPage() {
         </div>
         
         <div className="flex items-center gap-4 text-[10px] sm:text-xs tracking-widest font-bold">
-          <div className="hidden sm:block text-zinc-500">BUS: {id}</div>
+          <div className="hidden sm:block text-zinc-500">BUS: {project.id}</div>
           <div className="bg-zinc-900 px-3 py-1 text-emerald-400 font-black shadow-inner border-2 border-zinc-700 flex items-center gap-2">
             <Activity className="w-3 h-3" />
             {sysTime || "SYNCING..."}
@@ -154,7 +157,8 @@ export default function SCADAProjectPage() {
 
             <h2 className="text-[10px] sm:text-xs text-blue-700 font-black mb-1 tracking-[0.2em] flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-600 rounded-sm inline-block"></span>
-              {project.type}
+              {/* @ts-expect-error - fallback logic */}
+              {project.type || "ENGINEERING DEPLOYMENT"}
             </h2>
             <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 uppercase tracking-tight mb-2">
               {project.title}
@@ -168,7 +172,6 @@ export default function SCADAProjectPage() {
 
           {/* Mounted Display Component */}
           <div className="bg-zinc-300 p-2 sm:p-3 relative shadow-[0_10px_40px_rgba(0,0,0,0.1)] border-b-4 border-r-4 border-zinc-400">
-            {/* Corner Mounts */}
             <MountingHole className="-top-2 -left-2" />
             <MountingHole className="-top-2 -right-2" />
             <MountingHole className="-bottom-2 -left-2" />
@@ -178,7 +181,7 @@ export default function SCADAProjectPage() {
               <div className="flex items-center gap-2 bg-yellow-400 border-2 border-black px-2 py-1 shadow-sm">
                 <ShieldAlert className="w-3 h-3 text-black" />
                 <span className="text-[8px] sm:text-[10px] tracking-widest text-black font-black">
-                  CH_OUT [{currentMedia + 1}/{sortedMediaList.length}]
+                  CH_OUT [{sortedMediaList.length > 0 ? currentMedia + 1 : 0}/{sortedMediaList.length}]
                 </span>
               </div>
               
@@ -193,42 +196,49 @@ export default function SCADAProjectPage() {
 
             <div 
               ref={mediaContainerRef}
-              className="relative w-full aspect-video overflow-hidden bg-black border-4 border-zinc-800 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] group/fs"
+              className="relative w-full aspect-video overflow-hidden bg-black border-4 border-zinc-800 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] group/fs flex items-center justify-center"
             >
-              {sortedMediaList.map((media, idx) => (
-                <div 
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-                    idx === currentMedia ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-                  }`}
-                >
-                  {media.type === "youtube" ? (
-                    <iframe 
-                      src={getYouTubeEmbedUrl(media.url)}
-                      title={`${project.title} YouTube Video`}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full object-cover"
-                    />
-                  ) : media.type === "video" ? (
-                    <video 
-                      src={media.url} 
-                      autoPlay 
-                      controls
-                      muted 
-                      loop 
-                      playsInline
-                      className="w-full h-full object-contain bg-black"
-                    />
-                  ) : (
-                    <img 
-                      src={media.url} 
-                      alt={`${project.title} media ${idx + 1}`} 
-                      className="w-full h-full object-cover"
-                    />
-                  )}
+              {sortedMediaList.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-zinc-600 animate-pulse">
+                  <Activity className="w-12 h-12 mb-2" />
+                  <p className="text-xs font-black tracking-widest">NO SIGNAL / NO MEDIA</p>
                 </div>
-              ))}
+              ) : (
+                sortedMediaList.map((media, idx) => (
+                  <div 
+                    key={idx}
+                    className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+                      idx === currentMedia ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                    }`}
+                  >
+                    {media.type === "youtube" ? (
+                      <iframe 
+                        src={getYouTubeEmbedUrl(media.url)}
+                        title={`${project.title} YouTube Video`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full object-cover"
+                      />
+                    ) : media.type === "video" ? (
+                      <video 
+                        src={media.url} 
+                        autoPlay 
+                        controls
+                        muted 
+                        loop 
+                        playsInline
+                        className="w-full h-full object-contain bg-black"
+                      />
+                    ) : (
+                      <img 
+                        src={media.url} 
+                        alt={`${project.title} media ${idx + 1}`} 
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                ))
+              )}
             </div>
 
             {sortedMediaList.length > 1 && (
@@ -271,8 +281,9 @@ export default function SCADAProjectPage() {
              </div>
              
              <div className="p-4 sm:p-6 flex-grow flex flex-col">
-              <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-mono flex-grow font-medium relative pl-4 border-l-2 border-zinc-200">
-                <span className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-blue-500"></span>
+              {/* UPDATED: INCREASED SIZE AND CHANGED TO FONT-SANS FOR HR READABILITY */}
+              <p className="text-sm sm:text-base text-zinc-800 leading-relaxed font-sans flex-grow font-medium relative pl-4 border-l-2 border-blue-300">
+                <span className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-blue-500"></span>
                 {project.description}
                 <span className="animate-pulse ml-1 bg-blue-700 w-1.5 h-3 inline-block align-middle"></span>
               </p>
@@ -282,17 +293,18 @@ export default function SCADAProjectPage() {
           <div className="bg-white border-2 border-zinc-400 p-4 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
             <div className="flex items-center gap-2 mb-4 border-b-2 border-zinc-800 pb-2">
               <Terminal className="w-4 h-4 text-zinc-800" />
-              <h3 className="text-xs sm:text-sm font-black tracking-widest text-zinc-900">COMPONENT_WIRING_LIST</h3>
+              <h3 className="text-xs sm:text-sm font-black tracking-widest text-zinc-900">STACK_WIRING_LIST</h3>
             </div>
             
             <div className="grid grid-cols-1 gap-2">
-              {Object.entries(project.specs).map(([key, val], i) => (
-                <div key={key} className="flex justify-between items-center bg-zinc-50 border border-zinc-200 p-2">
+              {/* Safely map tags to simulate hardware pins */}
+              {project.tags.map((tag, i) => (
+                <div key={tag} className="flex justify-between items-center bg-zinc-50 border border-zinc-200 p-2">
                   <div className="flex items-center gap-2">
-                    <span className="bg-zinc-800 text-white text-[8px] font-black px-1 py-0.5 rounded-sm">PIN {i+1}</span>
-                    <span className="text-[10px] sm:text-xs text-zinc-600 font-bold">{key}</span>
+                    <span className="bg-zinc-800 text-white text-[8px] font-black px-1.5 py-0.5 rounded-sm">PIN 0{i+1}</span>
+                    <span className="text-[10px] sm:text-xs text-zinc-600 font-bold">TECH_NODE</span>
                   </div>
-                  <span className="text-[10px] sm:text-xs font-black text-blue-700 text-right">{val}</span>
+                  <span className="text-[10px] sm:text-xs font-black text-blue-700 text-right uppercase">{tag}</span>
                 </div>
               ))}
             </div>
@@ -306,13 +318,15 @@ export default function SCADAProjectPage() {
           </div>
 
           <div className="bg-zinc-200 border-2 border-zinc-400 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
-            <h3 className="text-[10px] sm:text-xs font-black tracking-widest text-zinc-500 mb-3 flex items-center gap-2">
+            <h3 className="text-[10px] sm:text-xs font-black tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
               <PlugZap className="w-3.5 h-3.5" /> EXTERNAL_CONNECTIONS
             </h3>
             
             <div className="flex flex-col gap-3">
+              {/* @ts-expect-error fallback */}
               {project.whitePaperLink && (
                 <Link 
+                  /* @ts-expect-error fallback */
                   href={project.whitePaperLink} 
                   target="_blank"
                   className="w-full relative group bg-blue-700 hover:bg-blue-800 border-b-4 border-blue-900 p-4 flex items-center justify-center gap-3 transition-all active:translate-y-1 active:border-b-0 shadow-md rounded-sm"
@@ -325,23 +339,47 @@ export default function SCADAProjectPage() {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <Link 
-                  href={project.github} 
-                  target="_blank"
-                  className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
-                >
-                  <Github className="w-5 h-5 text-zinc-800" />
-                  <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">SOURCE.REPO</span>
-                </Link>
+                {project.github ? (
+                  <Link 
+                    href={project.github} 
+                    target="_blank"
+                    className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
+                  >
+                    <Github className="w-5 h-5 text-zinc-800" />
+                    <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">SOURCE.REPO</span>
+                  </Link>
+                ) : (
+                  <div className="bg-zinc-300 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 shadow-sm rounded-sm opacity-60 cursor-not-allowed">
+                     <Github className="w-5 h-5 text-zinc-500" />
+                     <span className="text-[10px] font-black tracking-widest text-zinc-500 mt-1">N/A</span>
+                  </div>
+                )}
 
-                <Link 
-                  href={project.linkedin} 
-                  target="_blank"
-                  className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
-                >
-                  <Linkedin className="w-5 h-5 text-blue-700" />
-                  <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">NET.LINKEDIN</span>
-                </Link>
+                {/* Modified to handle live links OR linkedin links dynamically */}
+                {project.live ? (
+                  <Link 
+                    href={project.live} 
+                    target="_blank"
+                    className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
+                  >
+                    <ExternalLink className="w-5 h-5 text-emerald-600" />
+                    <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">LIVE.DEPL</span>
+                  </Link>
+                ) : project.linkedin ? (
+                  <Link 
+                    href={project.linkedin} 
+                    target="_blank"
+                    className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
+                  >
+                    <Linkedin className="w-5 h-5 text-blue-700" />
+                    <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">NET.LINKEDIN</span>
+                  </Link>
+                ) : (
+                  <div className="bg-zinc-300 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 shadow-sm rounded-sm opacity-60 cursor-not-allowed">
+                     <ExternalLink className="w-5 h-5 text-zinc-500" />
+                     <span className="text-[10px] font-black tracking-widest text-zinc-500 mt-1">N/A</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

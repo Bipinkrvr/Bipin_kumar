@@ -1,81 +1,83 @@
-// lib/projects-data.ts
-// Replace the placeholder URLs with your actual Drive, GitHub, LinkedIn, and YouTube links.
-
-export type MediaType = 'image' | 'youtube' | 'video';
-
-export interface ProjectMedia {
-  type: MediaType;
-  url: string;
-}
-
-export const projectsData = {
-  "MOD_01": { 
-    title: "VyaparLens AI", 
-    type: "STARTUP INITIATIVE",
-    description: "SYS_DESC: On-device Artificial Intelligence processing for merchant analytics. System utilizes Server-Driven UI via JSON payloads to dynamically alter interface states without client-side patch deployments. Optimized for low-latency inference on ARM-based mobile architectures.",
-    specs: { "FRAMEWORK": "Flutter 3.x", "ARCHITECTURE": "Server-Driven UI", "AI_MODEL": "On-Device TFLite", "DATABASE": "Local + Cloud Sync" },
-    media: [
-      { type: "image", url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" },
-      { type: "youtube", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }, // Put your YouTube link here
-      { type: "image", url: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&q=80" }
-    ] as ProjectMedia[],
-    github: "https://github.com/yourusername/vyaparlens",
-    linkedin: "https://linkedin.com/in/yourusername",
-    driveLink: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID_HERE",
-    whitePaperLink: "/docs/VyaparLens_AI_Whitepaper.pdf"
+export const projectsData = [
+  {
+    id: "residential-solar-autocad",
+    title: "Residential Solar Power System Design",
+    description: "Designed a complete Residential Solar Power System using industry-standard AutoCAD Electrical. Drafted professional documentation including Single Line Diagrams (SLD), Bill of Materials (BoM), and comprehensive load calculations for a full home setup.",
+    tags: ["AutoCAD Electrical", "Solar Power", "Electrical Design", "SLD"],
+    github: "", 
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_electricalengineering-autocadelectrical-finalyearproject-activity-7344994391503085571-GMRE?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
   },
-  "MOD_02": { 
-    title: "Thermal QC System", 
-    type: "HARDWARE AUTOMATION", 
-    description: "SYS_DESC: Automated hardware rig for stress-testing DC motors under extreme thermal loads. Integrates closed-loop feedback using IR and ambient temperature sensors to predict catastrophic failure points and trigger automated safety relays.",
-    specs: { "MCU": "ESP32 WROOM", "SENSOR_1": "DHT11 (Ambient)", "SENSOR_2": "MLX90614 (IR)", "OUTPUT": "Relay Matrix" },
-    media: [
-      { type: "youtube", url: "https://youtu.be/your_video_id_here" }, // YouTube links work with youtu.be as well
-      { type: "image", url: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80" }
-    ] as ProjectMedia[],
-    github: "https://github.com/yourusername/thermal-qc",
-    linkedin: "https://linkedin.com/in/yourusername",
-    driveLink: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID_HERE",
-    whitePaperLink: "/docs/Thermal_QC_Whitepaper.pdf"
+  {
+    id: "automated-motor-qc",
+    title: "Automated Quality Control Rig for DC Motors",
+    description: "Built a smart hardware testing system to automatically identify defective, overheating motors before they reach production. Uses sensors and predictive logic to monitor real-time temperature and safely cut power if a motor fails the test.",
+    tags: ["IoT", "ESP32", "Hardware Automation", "Sensors", "Quality Control"],
+    github: "https://github.com/Bipinkrvr/Automated-Motor-QC-Test-Rig",
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_esp32-iot-qualitycontrol-activity-7389325489292652544-HMji?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
   },
-  "MOD_03": { 
-    title: "Smart Water IoT", 
-    type: "CLOSED-LOOP TELEMETRY", 
-    description: "SYS_DESC: Distributed sensor network for liquid level telemetry. Utilizes ultrasonic time-of-flight measurements processed locally on an ESP32 edge node, transmitting state vectors via 802.11 b/g/n to a centralized Firebase Realtime Database for client dashboard synchronization.",
-    specs: { "MCU": "ESP32 NodeMCU", "SENSOR": "HC-SR04 Ultrasonic", "PROTOCOL": "BLE + WiFi (802.11)", "BACKEND": "Firebase RTDB" },
-    media: [
-      { type: "image", url: "https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=800&q=80" },
-      { type: "video", url: "https://www.w3schools.com/html/mov_bbb.mp4" } // Standard MP4 video file
-    ] as ProjectMedia[],
-    github: "https://github.com/yourusername/smart-water",
-    linkedin: "https://linkedin.com/in/yourusername",
-    driveLink: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID_HERE",
-    whitePaperLink: "/docs/SmartWater_IoT_Whitepaper.pdf"
+  {
+    id: "power-plant-dashboard",
+    title: "Power Plant Maintenance Data Dashboard",
+    description: "Developed an interactive business intelligence dashboard to track power plant equipment health. Created visual insights to help facility engineers monitor machine downtime, analyze maintenance logs, and optimize repair schedules.",
+    tags: ["Power BI", "Data Analytics", "DAX", "Maintenance Optimization"],
+    github: "",
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_powerbi-dataanalytics-businessintelligence-activity-7344231893871017984-hJDX?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
   },
-  "MOD_04": { 
-    title: "Glynac Analytics", 
-    type: "FRONT-END ARCHITECTURE", 
-    description: "SYS_DESC: High-performance data visualization client for wealth management tracking. Implements complex state machines to handle large JSON financial datasets, rendering real-time SVG charting components with strict layout shifts and accessibility compliance.",
-    specs: { "CORE": "Next.js 15", "UI_LIB": "Radix / Tailwind", "CHARTS": "Recharts", "STATE": "Zustand" },
-    media: [
-      { type: "image", url: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80" }
-    ] as ProjectMedia[],
-    github: "https://github.com/yourusername/glynac",
-    linkedin: "https://linkedin.com/in/yourusername",
-    driveLink: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID_HERE",
-    whitePaperLink: "/docs/Glynac_Architecture_Whitepaper.pdf"
+  {
+    id: "smart-water-tank",
+    title: "Smart Water Tank IoT System",
+    description: "Engineered a complete, production-ready system to automatically monitor and control industrial/home water tanks. Integrated hardware relays with a custom mobile app, allowing users to remotely manage pumps and receive live alerts.",
+    tags: ["IoT", "ESP32", "Flutter", "Firebase", "Relay Control"],
+    github: "https://github.com/Bipinkrvr/smart-water-tank-iot-project",
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_iot-flutter-firebase-activity-7386482224306593792-FfVU?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
   },
-  "MOD_05": { 
-    title: "Sensor Hub", 
-    type: "HARDWARE UPCYCLING", 
-    description: "SYS_DESC: Repurposing legacy mobile hardware as localized environmental data servers. A Linux environment (Termux) accesses internal IMU and telemetry sensors, piping raw data through a Node.js websocket server to a local Plotly.js visualization web app.",
-    specs: { "HOST": "Android 10+", "ENV": "Termux Linux", "RUNTIME": "Node.js v18", "VISUALS": "Plotly.js" },
-    media: [
-      { type: "image", url: "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?w=800&q=80" }
-    ] as ProjectMedia[],
-    github: "https://github.com/yourusername/sensor-hub",
-    linkedin: "https://linkedin.com/in/yourusername",
-    driveLink: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID_HERE",
-    whitePaperLink: "/docs/SensorHub_Whitepaper.pdf"
+  {
+    id: "vlsi-digital-design",
+    title: "VLSI Digital Logic & FSM Design",
+    description: "Designed and simulated foundational digital circuits (Logic Gates, Adders) and a Finite State Machine (FSM). Verified hardware behavior using industry tools to ensure accurate digital logic implementation.",
+    tags: ["VLSI", "Verilog", "ModelSim", "Digital Logic", "FSM"],
+    github: "https://github.com/Bipinkrvr/CODTECH-TASK-2", // Linking to the more advanced FSM task
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_i-have-completed-my-tasks-given-by-codtech-activity-7216369727969918976-bttI?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
   },
-};
+  {
+    id: "iot-phone-sensor",
+    title: "Upcycled IoT Sensor Hub",
+    description: "Innovatively repurposed an abandoned smartphone into a live environmental sensor hub. Extracted onboard hardware data (accelerometer, light sensors) and streamed it to a custom web interface for real-time monitoring.",
+    tags: ["IoT", "Python", "Sensors", "Hardware Upcycling"],
+    github: "https://github.com/Bipinkrvr/IoT-Phone-Sensor-Dashboard",
+    linkedin: "https://www.linkedin.com/posts/bipinkrvr_iot-upcycling-android-ugcPost-7385323312396128256-hKtu?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE9nUx8B9pSDoZpCQMBGvSV3MRFOu7UMIT8",
+    live: ""
+  },
+  {
+    id: "nextjs-sales-dashboard",
+    title: "Interactive Sales Analytics Dashboard",
+    description: "Created a fast, scalable web dashboard to visualize sales trends and business data, demonstrating strong front-end software capabilities and modern UI architecture.",
+    tags: ["Next.js", "React", "TypeScript", "Data Visualization"],
+    github: "https://github.com/Bipinkrvr/Next.js-Advanced-Sales-Dashboard",
+    linkedin: "",
+    live: "https://next-js-advanced-sales-dashboard.vercel.app/"
+  },
+  {
+    id: "explore-jharkhand",
+    title: "Explore Jharkhand Web Platform",
+    description: "Developed a responsive promotional website highlighting regional industries, mineral wealth, and tourism using modern layout techniques and interactive elements.",
+    tags: ["HTML", "CSS", "UI/UX", "Responsive Design"],
+    github: "https://github.com/Bipinkrvr/Bipin_LetsUpgradeFrontendSprint",
+    linkedin: "",
+    live: "https://bipin-lets-upgrade-frontend-sprint.vercel.app/"
+  },
+  {
+    id: "memorae-landing",
+    title: "Memorae App Landing Page",
+    description: "Built a highly animated, visually engaging landing page for a hackathon project, focusing on a vibrant user interface and smooth scroll animations.",
+    tags: ["React", "Framer Motion", "Tailwind CSS"],
+    github: "https://github.com/Bipinkrvr/memorae-landing-page",
+    linkedin: "",
+    live: "https://memorae-landing-page-kgou.vercel.app/"
+  }
+];
