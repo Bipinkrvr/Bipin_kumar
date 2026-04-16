@@ -1,314 +1,353 @@
+// app/project/[id]/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
-  X, Database, Cpu, Smartphone, Wifi, Server, Activity, 
-  ArrowRightLeft, Image as ImageIcon, Github, Linkedin, 
-  DownloadCloud, ZoomIn, ZoomOut, Maximize,
-  MousePointerClick, Move
+  ArrowLeft, FileText, Github, Activity, 
+  Terminal, ShieldAlert, Cpu, Settings, ChevronLeft, ChevronRight, Linkedin, Maximize,
+  Zap, CircuitBoard, PlugZap
 } from "lucide-react";
-import { projectsData } from "@/lib/projects-data"; 
+import { projectsData, ProjectMedia } from "@/lib/projects-data"; 
 
-export default function AutoCADProjectPage() {
+const getYouTubeEmbedUrl = (url: string) => {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}?rel=0&modestbranding=1`;
+  }
+  return url;
+};
+
+// --- UPDATED: Wires Extended Off-Screen and Heavily Populated Right Side ---
+const CleanWireBackground = () => (
+  <div className="fixed top-0 left-0 w-full h-[100svh] pointer-events-none z-0 overflow-hidden bg-[#f4f4f5]">
+    {/* Base Schematic Grid */}
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+
+    {/* VCC / POWER BUS (Amber) - Extended past right edge */}
+    <div className="absolute top-0 left-[8vw] w-[100vw] h-[15svh] border-b-[6px] border-l-[6px] border-amber-500 rounded-bl-[2rem]"></div>
+    <div className="absolute top-0 left-[9.5vw] w-[100vw] h-[17svh] border-b-[6px] border-l-[6px] border-amber-500 rounded-bl-[2.2rem]"></div>
+    <div className="absolute top-0 left-[11vw] w-[100vw] h-[19svh] border-b-[6px] border-l-[6px] border-amber-500 rounded-bl-[2.4rem]"></div>
+    <div className="absolute top-[19svh] left-[11vw] w-4 h-4 rounded-full border-[5px] border-amber-500 bg-[#f4f4f5] shadow-inner translate-x-[-5px] translate-y-[-5px]"></div>
+
+    {/* DATA BUS (Blue) - Extended past bottom edge */}
+    <div className="absolute top-[30svh] left-0 w-[12vw] h-[80svh] border-t-[6px] border-r-[6px] border-blue-600 rounded-tr-[2rem]"></div>
+    <div className="absolute top-[32svh] left-0 w-[13.5vw] h-[80svh] border-t-[6px] border-r-[6px] border-blue-600 rounded-tr-[2.2rem]"></div>
+    <div className="absolute top-[34svh] left-0 w-[15vw] h-[80svh] border-t-[6px] border-r-[6px] border-blue-600 rounded-tr-[2.4rem]"></div>
+    <div className="absolute top-[36svh] left-0 w-[16.5vw] h-[80svh] border-t-[6px] border-r-[6px] border-blue-600 rounded-tr-[2.6rem]"></div>
+    <div className="absolute top-[36svh] left-[16.5vw] w-4 h-4 rounded-full border-[5px] border-blue-600 bg-[#f4f4f5] shadow-inner translate-x-[-5px] translate-y-[-5px]"></div>
+
+    {/* NEUTRAL / GROUND BUS (Zinc) - Extended past right edge using negative right spacing */}
+    <div className="absolute bottom-0 right-[-5vw] w-[45vw] h-[40svh] border-t-[6px] border-l-[6px] border-zinc-500 rounded-tl-[2rem]"></div>
+    <div className="absolute bottom-0 right-[-5vw] w-[43.5vw] h-[42svh] border-t-[6px] border-l-[6px] border-zinc-500 rounded-tl-[2.2rem]"></div>
+    <div className="absolute bottom-0 right-[-5vw] w-[42vw] h-[44svh] border-t-[6px] border-l-[6px] border-zinc-500 rounded-tl-[2.4rem]"></div>
+
+    {/* SENSOR BUS (Emerald) - Added more wires, extending past top and right edge */}
+    <div className="absolute top-[-5svh] right-0 w-[15vw] h-[55svh] border-b-[4px] border-l-[4px] border-emerald-500 rounded-bl-[2rem]"></div>
+    <div className="absolute top-[-5svh] right-0 w-[13.5vw] h-[53svh] border-b-[4px] border-l-[4px] border-emerald-500 rounded-bl-[1.8rem]"></div>
+    <div className="absolute top-[-5svh] right-0 w-[12vw] h-[51svh] border-b-[4px] border-l-[4px] border-emerald-500 rounded-bl-[1.6rem]"></div>
+    <div className="absolute top-[-5svh] right-0 w-[10.5vw] h-[49svh] border-b-[4px] border-l-[4px] border-emerald-500 rounded-bl-[1.4rem]"></div>
+    <div className="absolute top-[49svh] right-[10.5vw] w-3 h-3 rounded-full border-[4px] border-emerald-500 bg-[#f4f4f5] shadow-inner translate-x-[-3.5px] translate-y-[-3.5px]"></div>
+
+    {/* NEW AUXILIARY BUS (Purple) - Filling out the middle-right space, extending past bottom edge */}
+    <div className="absolute bottom-[-5svh] right-0 w-[8vw] h-[35svh] border-t-[4px] border-l-[4px] border-purple-500 rounded-tl-[1.5rem]"></div>
+    <div className="absolute bottom-[-5svh] right-0 w-[6.5vw] h-[33svh] border-t-[4px] border-l-[4px] border-purple-500 rounded-tl-[1.3rem]"></div>
+    <div className="absolute bottom-[-5svh] right-0 w-[5vw] h-[31svh] border-t-[4px] border-l-[4px] border-purple-500 rounded-tl-[1.1rem]"></div>
+    <div className="absolute bottom-[26svh] right-[8vw] w-3 h-3 rounded-full border-[4px] border-purple-500 bg-[#f4f4f5] shadow-inner translate-x-[-3.5px] translate-y-[-3.5px]"></div>
+  </div>
+);
+
+// Helper component for PCB mounting holes on panels
+const MountingHole = ({ className }: { className: string }) => (
+  <div className={`absolute w-5 h-5 bg-zinc-200 rounded-full border-2 border-zinc-400 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] z-30 ${className}`}>
+    <div className="w-3 h-[2px] bg-zinc-500 rotate-45"></div>
+  </div>
+);
+
+export default function SCADAProjectPage() {
   const params = useParams();
   const router = useRouter();
   const id = typeof params.id === "string" ? params.id : "MOD_01";
   
   const project = projectsData[id as keyof typeof projectsData] || projectsData["MOD_01"];
-
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [currentDate, setCurrentDate] = useState("");
-
-  // PAN & ZOOM STATE
-  const [scale, setScale] = useState(0.8);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
-  // UX GUARDRAIL STATE
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [sysTime, setSysTime] = useState("");
+  const [currentMedia, setCurrentMedia] = useState(0);
+  const mediaContainerRef = useRef<HTMLDivElement>(null);
+
+  const sortedMediaList = useMemo(() => {
+    const media = project.media || [];
+    return [...media].sort((a, b) => {
+      const aIsVideo = a.type === 'video' || a.type === 'youtube';
+      const bIsVideo = b.type === 'video' || b.type === 'youtube';
+      if (aIsVideo && !bIsVideo) return -1;
+      if (!aIsVideo && bIsVideo) return 1;
+      return 0;
+    });
+  }, [project.media]);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", handleMouseMove);
-    
-    const date = new Date();
-    setCurrentDate(`${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`);
-    
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    const interval = setInterval(() => {
+      const d = new Date();
+      setSysTime(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')} IST`);
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  // PAN & ZOOM HANDLERS
-  const handlePointerDown = (e: React.PointerEvent) => {
-    setHasInteracted(true); 
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
+  const nextMedia = () => setCurrentMedia((prev) => (prev + 1) % sortedMediaList.length);
+  const prevMedia = () => setCurrentMedia((prev) => (prev - 1 + sortedMediaList.length) % sortedMediaList.length);
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (isDragging) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
-      });
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      mediaContainerRef.current?.requestFullscreen().catch(err => console.error(err));
+    } else {
+      document.exitFullscreen();
     }
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    setIsDragging(false);
-    e.currentTarget.releasePointerCapture(e.pointerId);
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    setHasInteracted(true); 
-    const zoomSensitivity = 0.002;
-    const delta = -e.deltaY * zoomSensitivity;
-    setScale(s => Math.min(Math.max(0.2, s + delta), 4));
-  };
-
-  const zoomIn = () => { setHasInteracted(true); setScale(s => Math.min(s + 0.2, 4)); };
-  const zoomOut = () => { setHasInteracted(true); setScale(s => Math.max(s - 0.2, 0.2)); };
-  const resetZoom = () => { setHasInteracted(true); setScale(0.8); setPosition({ x: 0, y: 0 }); };
-
   return (
-    <main 
-      className="w-screen h-[100dvh] bg-[#0a0a0a] text-[#00ffff] overflow-hidden relative select-none flex flex-col uppercase tracking-wider"
-      style={{ fontFamily: "'Courier New', Courier, monospace" }}
-    >
+    <main className="min-h-[100svh] bg-transparent text-zinc-900 font-mono select-none overflow-x-hidden pb-12 relative">
       
-      {/* 1. DYNAMIC FULL-SCREEN CROSSHAIRS */}
-      <div className="fixed top-0 bottom-0 w-[1px] bg-white/30 pointer-events-none z-[80] mix-blend-difference hidden sm:block" style={{ left: `${mousePos.x}px` }} />
-      <div className="fixed left-0 right-0 h-[1px] bg-white/30 pointer-events-none z-[80] mix-blend-difference hidden sm:block" style={{ top: `${mousePos.y}px` }} />
+      {/* PERFECT WIRE BACKGROUND COMPONENT */}
+      <CleanWireBackground />
 
-      {/* 2. TOP RIBBON / MENU BAR */}
-      <div className="h-14 bg-[#1f1f1f] border-b border-[#333] z-[90] flex items-center justify-between px-4 shadow-md shrink-0 relative">
-        <div className="flex items-center gap-4 sm:gap-6">
-          <div className="flex gap-2">
-            <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-            <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-          </div>
-          <span className="text-[10px] sm:text-xs text-gray-400 font-bold hidden sm:block">AUTOCAD ENG. - [{id}_SCHEMATIC.DWG]</span>
-        </div>
-        
-        <div className="flex items-center gap-2 sm:gap-4">
-          <div className="flex items-center gap-1 sm:gap-3 border-r border-[#444] pr-2 sm:pr-4 mr-1 sm:mr-2">
-            <Link href={project.github} target="_blank" className="p-1.5 hover:bg-[#444] rounded text-gray-400 hover:text-white transition-colors group" title="Source Code">
-              <Github className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-            </Link>
-            <Link href={project.linkedin} target="_blank" className="p-1.5 hover:bg-[#444] rounded text-gray-400 hover:text-white transition-colors group" title="Network">
-              <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-            </Link>
-            <Link href={project.driveLink} target="_blank" className="ml-2 flex items-center gap-2 bg-cyan-900/30 hover:bg-cyan-900/60 text-cyan-400 border border-cyan-500/50 px-2 sm:px-3 py-1 rounded text-[9px] sm:text-[10px] font-bold transition-all hover:shadow-[0_0_10px_rgba(0,255,255,0.2)]">
-              <DownloadCloud className="w-4 h-4" /> 
-              <span className="hidden sm:block">FETCH_ARCHIVE</span>
-            </Link>
-          </div>
-
+      {/* 1. TOP POWER RAIL */}
+      <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b-4 border-blue-700 flex items-center justify-between px-3 sm:px-6 py-2 shadow-md">
+        <div className="flex items-center gap-3">
           <button 
             onClick={() => router.back()}
-            className="flex items-center gap-2 bg-[#ff5f56]/10 hover:bg-[#ff5f56]/20 text-[#ff5f56] border border-[#ff5f56]/30 px-3 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer z-[100]"
+            className="flex items-center gap-1 bg-zinc-100 hover:bg-zinc-200 border-2 border-zinc-300 px-2 sm:px-3 py-1 text-[10px] sm:text-xs font-black transition-colors text-zinc-700 shadow-sm active:translate-y-px"
           >
-            <X className="w-3.5 h-3.5" /> CLOSE
+            <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">DISCONNECT</span>
           </button>
+          <div className="hidden sm:flex items-center gap-2 px-3 border-l-2 border-zinc-300">
+            <Zap className="w-4 h-4 text-amber-500 fill-amber-500 animate-pulse" />
+            <span className="text-[10px] tracking-widest text-zinc-700 font-black">VCC (5V) ONLINE</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-4 text-[10px] sm:text-xs tracking-widest font-bold">
+          <div className="hidden sm:block text-zinc-500">BUS: {id}</div>
+          <div className="bg-zinc-900 px-3 py-1 text-emerald-400 font-black shadow-inner border-2 border-zinc-700 flex items-center gap-2">
+            <Activity className="w-3 h-3" />
+            {sysTime || "SYNCING..."}
+          </div>
         </div>
       </div>
 
-      {/* 3. ZOOMABLE / PANNABLE DRAFTING CANVAS */}
-      <div 
-        className={`flex-grow relative z-10 overflow-hidden bg-black ${isDragging ? 'cursor-grabbing' : 'cursor-grab sm:cursor-crosshair'}`}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onWheel={handleWheel}
-      >
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative z-10">
         
-        {/* ONBOARDING OVERLAY */}
-        <div 
-          className={`absolute inset-0 z-50 flex items-center justify-center pointer-events-none transition-opacity duration-700 bg-black/60 backdrop-blur-sm ${hasInteracted ? 'opacity-0' : 'opacity-100'}`}
-        >
-          <div className="bg-[#111] border border-cyan-500/50 p-6 rounded-lg shadow-[0_0_30px_rgba(0,255,255,0.15)] flex flex-col items-center gap-4 animate-bounce-slow">
-            <div className="flex gap-6 text-cyan-400">
-              <div className="flex flex-col items-center gap-2">
-                <MousePointerClick className="w-8 h-8" />
-                <span className="text-xs font-bold">SCROLL TO ZOOM</span>
-              </div>
-              <div className="w-[1px] h-12 bg-cyan-500/30"></div>
-              <div className="flex flex-col items-center gap-2">
-                <Move className="w-8 h-8" />
-                <span className="text-xs font-bold">DRAG TO PAN</span>
-              </div>
-            </div>
-            <div className="text-cyan-500/70 text-[10px] mt-2 border-t border-cyan-500/20 pt-2 text-center">
-              INTERACTIVE BLUEPRINT MODE ACTIVATED
-            </div>
-          </div>
-        </div>
-
-        {/* Dynamic Background Grid */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-20"
-          style={{
-            backgroundSize: `${50 * scale}px ${50 * scale}px, ${10 * scale}px ${10 * scale}px`,
-            backgroundImage: `
-              linear-gradient(to right, #00ffff 1px, transparent 1px),
-              linear-gradient(to bottom, #00ffff 1px, transparent 1px),
-              linear-gradient(to right, rgba(0,255,255,0.2) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0,255,255,0.2) 1px, transparent 1px)
-            `,
-            backgroundPosition: `${position.x}px ${position.y}px`
-          }}
-        />
-
-        {/* The Transformed "Paper Space" Wrapper */}
-        <div 
-          className="absolute top-1/2 left-1/2"
-          style={{ 
-            transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`,
-            transformOrigin: "center center"
-          }}
-        >
-          {/* THE MASTER DRAWING SHEET */}
-          <div className="w-[1440px] h-[900px] border-[3px] border-cyan-500 bg-[#050505] relative shadow-[0_0_50px_rgba(0,255,255,0.05)] p-6">
+        {/* 2. SCHEMATIC & MEDIA (LEFT COLUMN) */}
+        <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
+          
+          {/* Title Block Panel */}
+          <div className="bg-white border-2 border-zinc-400 p-5 sm:p-7 relative shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
+            <div className="absolute top-0 right-12 w-0.5 h-4 bg-blue-600"></div>
+            <div className="absolute top-4 right-10 w-4 h-0.5 bg-blue-600"></div>
+            <div className="absolute top-3 right-8 w-2.5 h-2.5 rounded-full border-[3px] border-blue-600 bg-white"></div>
             
-            <div className="absolute inset-4 border border-cyan-500/40 pointer-events-none z-0"></div>
+            <div className="absolute top-0 right-0 bg-blue-50 px-3 py-1 text-[8px] sm:text-[10px] border-b-2 border-l-2 border-blue-200 text-blue-800 font-black flex items-center gap-1">
+              <CircuitBoard className="w-3 h-3" /> REV: 1.0.0
+            </div>
 
-            <div className="relative z-10 w-full h-full flex flex-col gap-6">
+            <h2 className="text-[10px] sm:text-xs text-blue-700 font-black mb-1 tracking-[0.2em] flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-600 rounded-sm inline-block"></span>
+              {project.type}
+            </h2>
+            <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 uppercase tracking-tight mb-2">
+              {project.title}
+            </h1>
+            
+            <div className="flex gap-4 text-[10px] sm:text-xs text-zinc-600 mt-5 border-t-2 border-dashed border-zinc-300 pt-3 font-bold">
+              <span className="flex items-center gap-1"><Cpu className="w-3.5 h-3.5 text-zinc-400" /> LEAD: BIPIN_KUMAR</span>
+              <span className="flex items-center gap-1 px-4 border-l-2 border-zinc-300"><Settings className="w-3.5 h-3.5 text-zinc-400" /> DEPLOYED</span>
+            </div>
+          </div>
+
+          {/* Mounted Display Component */}
+          <div className="bg-zinc-300 p-2 sm:p-3 relative shadow-[0_10px_40px_rgba(0,0,0,0.1)] border-b-4 border-r-4 border-zinc-400">
+            {/* Corner Mounts */}
+            <MountingHole className="-top-2 -left-2" />
+            <MountingHole className="-top-2 -right-2" />
+            <MountingHole className="-bottom-2 -left-2" />
+            <MountingHole className="-bottom-2 -right-2" />
+
+            <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between pointer-events-none">
+              <div className="flex items-center gap-2 bg-yellow-400 border-2 border-black px-2 py-1 shadow-sm">
+                <ShieldAlert className="w-3 h-3 text-black" />
+                <span className="text-[8px] sm:text-[10px] tracking-widest text-black font-black">
+                  CH_OUT [{currentMedia + 1}/{sortedMediaList.length}]
+                </span>
+              </div>
               
-              {/* TOP ROW */}
-              <div className="flex gap-6 h-[480px]">
-                <div className="flex-1 border border-cyan-500/40 bg-[#0a0a0a] relative flex items-center justify-center shadow-[inset_0_0_30px_rgba(0,255,255,0.02)]">
-                  <span className="absolute top-3 left-3 text-xs text-cyan-500/50">FIG 1: DATA_FLOW.DWG</span>
-                  <div className="flex items-center gap-8 text-cyan-400 w-full justify-center opacity-70">
-                    {id.includes("01") && <><Smartphone className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Database className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Server className="w-20 h-20" /></>}
-                    {id.includes("02") && <><Cpu className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Activity className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Server className="w-20 h-20" /></>}
-                    {id.includes("03") && <><Activity className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Cpu className="w-20 h-20" /><Wifi className="w-8 h-8 mx-2" /><Database className="w-20 h-20" /></>}
-                    {id.includes("04") && <><Server className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Activity className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Smartphone className="w-20 h-20" /></>}
-                    {id.includes("05") && <><Smartphone className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Server className="w-20 h-20" /><ArrowRightLeft className="w-8 h-8" /><Activity className="w-20 h-20" /></>}
-                  </div>
+              <button 
+                onClick={toggleFullScreen}
+                className="pointer-events-auto bg-black hover:bg-zinc-800 text-white border-2 border-zinc-600 px-2 py-1 shadow-sm flex items-center gap-1 transition-colors active:scale-95"
+              >
+                <Maximize className="w-3 h-3 text-blue-400" />
+                <span className="text-[8px] sm:text-[10px] font-black tracking-widest hidden sm:inline">MAXIMIZE</span>
+              </button>
+            </div>
+
+            <div 
+              ref={mediaContainerRef}
+              className="relative w-full aspect-video overflow-hidden bg-black border-4 border-zinc-800 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] group/fs"
+            >
+              {sortedMediaList.map((media, idx) => (
+                <div 
+                  key={idx}
+                  className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+                    idx === currentMedia ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                  }`}
+                >
+                  {media.type === "youtube" ? (
+                    <iframe 
+                      src={getYouTubeEmbedUrl(media.url)}
+                      title={`${project.title} YouTube Video`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full object-cover"
+                    />
+                  ) : media.type === "video" ? (
+                    <video 
+                      src={media.url} 
+                      autoPlay 
+                      controls
+                      muted 
+                      loop 
+                      playsInline
+                      className="w-full h-full object-contain bg-black"
+                    />
+                  ) : (
+                    <img 
+                      src={media.url} 
+                      alt={`${project.title} media ${idx + 1}`} 
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {sortedMediaList.length > 1 && (
+              <div className="flex justify-between items-center mt-3 z-20 px-2">
+                <button onClick={prevMedia} className="bg-zinc-100 hover:bg-white border-2 border-zinc-400 p-1.5 shadow-sm active:translate-y-px">
+                  <ChevronLeft className="w-5 h-5 text-zinc-700" />
+                </button>
+                
+                <div className="flex gap-1 items-center px-2 bg-zinc-200 p-1 border-2 border-zinc-400 rounded-sm shadow-inner">
+                  <span className="text-[8px] font-black tracking-widest text-zinc-500 mr-2">MUX SEL:</span>
+                  {sortedMediaList.map((_, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => setCurrentMedia(idx)}
+                      className={`w-6 h-6 flex items-center justify-center text-[10px] font-black border-2 transition-all ${
+                        idx === currentMedia 
+                          ? "bg-amber-400 text-black border-amber-600 shadow-sm" 
+                          : "bg-zinc-100 text-zinc-400 border-zinc-300 hover:bg-zinc-50"
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
                 </div>
 
-                <div className="w-[550px] border border-cyan-500/40 bg-[#0a0a0a] relative overflow-hidden group">
-                  <span className="absolute top-3 left-3 text-xs text-cyan-400 z-20 bg-black/80 px-2 py-1 border border-cyan-500/40">
-                    <ImageIcon className="w-4 h-4 inline mr-2 mb-0.5" /> REF_IMG_ATTACHMENT
+                <button onClick={nextMedia} className="bg-zinc-100 hover:bg-white border-2 border-zinc-400 p-1.5 shadow-sm active:translate-y-px">
+                  <ChevronRight className="w-5 h-5 text-zinc-700" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 3. LOGIC & TERMINALS (RIGHT COLUMN) */}
+        <div className="col-span-1 lg:col-span-5 flex flex-col gap-6">
+          
+          <div className="bg-white border-2 border-zinc-400 flex-grow flex flex-col shadow-[0_8px_30px_rgba(0,0,0,0.05)] relative overflow-hidden">
+             <div className="h-8 w-full bg-[repeating-linear-gradient(45deg,#facc15,#facc15_10px,#000_10px,#000_20px)] border-b-2 border-zinc-400 flex items-center justify-center">
+                <span className="bg-black px-2 text-[10px] font-black text-yellow-400 tracking-widest">SYSTEM_ABSTRACT</span>
+             </div>
+             
+             <div className="p-4 sm:p-6 flex-grow flex flex-col">
+              <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-mono flex-grow font-medium relative pl-4 border-l-2 border-zinc-200">
+                <span className="absolute -left-[5px] top-1 w-2 h-2 rounded-full bg-blue-500"></span>
+                {project.description}
+                <span className="animate-pulse ml-1 bg-blue-700 w-1.5 h-3 inline-block align-middle"></span>
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white border-2 border-zinc-400 p-4 sm:p-6 shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center gap-2 mb-4 border-b-2 border-zinc-800 pb-2">
+              <Terminal className="w-4 h-4 text-zinc-800" />
+              <h3 className="text-xs sm:text-sm font-black tracking-widest text-zinc-900">COMPONENT_WIRING_LIST</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2">
+              {Object.entries(project.specs).map(([key, val], i) => (
+                <div key={key} className="flex justify-between items-center bg-zinc-50 border border-zinc-200 p-2">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-zinc-800 text-white text-[8px] font-black px-1 py-0.5 rounded-sm">PIN {i+1}</span>
+                    <span className="text-[10px] sm:text-xs text-zinc-600 font-bold">{key}</span>
+                  </div>
+                  <span className="text-[10px] sm:text-xs font-black text-blue-700 text-right">{val}</span>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 flex flex-col items-center justify-center text-zinc-400">
+              <div className="w-px h-3 bg-zinc-400"></div>
+              <div className="w-4 h-px bg-zinc-400 mb-[2px]"></div>
+              <div className="w-2 h-px bg-zinc-400 mb-[2px]"></div>
+              <div className="w-1 h-px bg-zinc-400"></div>
+            </div>
+          </div>
+
+          <div className="bg-zinc-200 border-2 border-zinc-400 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.1)]">
+            <h3 className="text-[10px] sm:text-xs font-black tracking-widest text-zinc-500 mb-3 flex items-center gap-2">
+              <PlugZap className="w-3.5 h-3.5" /> EXTERNAL_CONNECTIONS
+            </h3>
+            
+            <div className="flex flex-col gap-3">
+              {project.whitePaperLink && (
+                <Link 
+                  href={project.whitePaperLink} 
+                  target="_blank"
+                  className="w-full relative group bg-blue-700 hover:bg-blue-800 border-b-4 border-blue-900 p-4 flex items-center justify-center gap-3 transition-all active:translate-y-1 active:border-b-0 shadow-md rounded-sm"
+                >
+                  <FileText className="w-5 h-5 text-white" />
+                  <span className="text-xs sm:text-sm font-black tracking-widest text-white">
+                    EXTRACT TECHNICAL DATASHEET
                   </span>
-                  <img 
-                    src={project.imageRef} 
-                    alt="Reference" 
-                    className="w-full h-full object-cover opacity-60 mix-blend-screen filter grayscale contrast-125 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-700 pointer-events-none"
-                  />
-                  <div className="absolute inset-0 bg-cyan-500/10 pointer-events-none mix-blend-overlay"></div>
-                </div>
-              </div>
+                </Link>
+              )}
 
-              {/* BOTTOM ROW */}
-              <div className="flex gap-6 flex-1">
-                <div className="w-[450px] border border-cyan-500/40 bg-[#0a0a0a] p-8">
-                  <h3 className="text-cyan-400 font-bold border-b border-cyan-500/40 pb-3 mb-6 text-base tracking-widest">[SYSTEM_PARAMETERS]</h3>
-                  <div className="flex flex-col gap-4 text-sm text-cyan-100/70">
-                    {Object.entries(project.specs).map(([key, val]) => (
-                      <div key={key} className="flex justify-between border-b border-cyan-500/10 pb-2">
-                        <span className="text-cyan-500/80">{key}:</span>
-                        <span className="text-right font-bold text-cyan-300">{val}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Link 
+                  href={project.github} 
+                  target="_blank"
+                  className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
+                >
+                  <Github className="w-5 h-5 text-zinc-800" />
+                  <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">SOURCE.REPO</span>
+                </Link>
 
-                <div className="flex-1 border border-cyan-500/40 bg-[#0a0a0a] p-8 relative">
-                  <h3 className="text-cyan-400 font-bold border-b border-cyan-500/40 pb-3 mb-6 text-base tracking-widest">[OPERATIONAL_ABSTRACT]</h3>
-                  <p className="text-base text-cyan-100/70 leading-[2.5] max-w-3xl pr-[300px]">
-                    {project.description}
-                  </p>
-                </div>
+                <Link 
+                  href={project.linkedin} 
+                  target="_blank"
+                  className="bg-white hover:bg-zinc-50 border-b-4 border-zinc-400 p-3 flex flex-col items-center justify-center gap-1 transition-all active:translate-y-1 active:border-b-0 shadow-sm rounded-sm"
+                >
+                  <Linkedin className="w-5 h-5 text-blue-700" />
+                  <span className="text-[10px] font-black tracking-widest text-zinc-700 mt-1">NET.LINKEDIN</span>
+                </Link>
               </div>
             </div>
-
-            {/* 4. CLASSIC HORIZONTAL TITLE BLOCK */}
-            <div className="absolute bottom-4 right-4 w-[900px] bg-[#050505] border-[3px] border-cyan-500 z-30 shadow-[0_0_30px_rgba(0,255,255,0.1)]">
-              <div className="grid grid-cols-5 grid-rows-3 text-xs">
-                <div className="col-span-3 row-span-2 border-r-[3px] border-b-[3px] border-cyan-500 p-4 flex flex-col justify-center bg-[#0a0a0a]">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">PROJECT TITLE</span>
-                  <span className="font-black text-cyan-300 text-3xl truncate mt-1">{project.title}</span>
-                </div>
-                <div className="col-span-2 border-b-[3px] border-cyan-500 p-4 flex flex-col justify-center bg-[#080808]">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">INSTITUTION / COMPANY</span>
-                  <span className="font-bold text-white text-base mt-1">BIT SINDRI - ELECTRICAL DEPT.</span>
-                </div>
-                <div className="border-r-[3px] border-b-[3px] border-cyan-500 p-4 flex flex-col justify-center bg-[#080808]">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">DOC ID</span>
-                  <span className="font-bold text-white text-sm mt-1">{id}</span>
-                </div>
-                <div className="border-b-[3px] border-cyan-500 p-4 flex flex-col justify-center bg-[#080808]">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">SYSTEM TYPE</span>
-                  <span className="font-bold text-white text-sm truncate mt-1">{project.type}</span>
-                </div>
-                <div className="border-r-[3px] border-cyan-500 p-4 flex flex-col justify-center">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">DRAWN BY</span>
-                  <span className="font-bold text-[#ffbd2e] text-sm mt-1">BIPIN K.</span>
-                </div>
-                <div className="border-r-[3px] border-cyan-500 p-4 flex flex-col justify-center">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">DATE</span>
-                  <span className="font-bold text-white text-sm mt-1">{currentDate}</span>
-                </div>
-                <div className="border-r-[3px] border-cyan-500 p-4 flex flex-col justify-center">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">SCALE</span>
-                  <span className="font-bold text-white text-sm mt-1">FIT TO PAGE</span>
-                </div>
-                <div className="border-r-[3px] border-cyan-500 p-4 flex flex-col justify-center">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">REV</span>
-                  <span className="font-bold text-white text-sm mt-1">01A</span>
-                </div>
-                <div className="p-4 flex flex-col justify-center">
-                  <span className="text-cyan-500/70 font-bold tracking-widest">SHEET</span>
-                  <span className="font-bold text-white text-sm mt-1">1 OF 1</span>
-                </div>
-              </div>
-            </div>
-
           </div>
+
         </div>
       </div>
-
-      {/* 5. FLOATING ZOOM CONTROLS */}
-      <div className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 sm:gap-3 z-[60]">
-        <button onClick={zoomIn} title="Zoom In" className="p-3 sm:p-4 bg-[#111] text-cyan-400 border border-cyan-500/50 hover:bg-[#222] rounded shadow-2xl transition-all active:scale-95">
-          <ZoomIn className="w-6 h-6 sm:w-5 sm:h-5" />
-        </button>
-        <button onClick={resetZoom} title="Zoom to Fit" className="p-3 sm:p-4 bg-[#111] text-cyan-400 border border-cyan-500/50 hover:bg-[#222] rounded shadow-2xl transition-all active:scale-95">
-          <Maximize className="w-6 h-6 sm:w-5 sm:h-5" />
-        </button>
-        <button onClick={zoomOut} title="Zoom Out" className="p-3 sm:p-4 bg-[#111] text-cyan-400 border border-cyan-500/50 hover:bg-[#222] rounded shadow-2xl transition-all active:scale-95">
-          <ZoomOut className="w-6 h-6 sm:w-5 sm:h-5" />
-        </button>
-      </div>
-
-      {/* 6. BOTTOM COMMAND LINE INTERFACE */}
-      <div className="h-8 bg-[#dbdce0] text-black text-[10px] sm:text-xs flex items-center z-[90] shrink-0 font-bold relative">
-        <div className="px-2 sm:px-3 py-1 bg-white border-r border-gray-400 flex-grow max-w-[50%] sm:max-w-[60%] flex items-center h-full shadow-inner truncate">
-          <span className="mr-2 text-gray-700">COMMAND:</span>
-          <span className="text-blue-600 animate-pulse">_</span>
-        </div>
-        
-        <div className="ml-auto flex items-center gap-2 sm:gap-4 px-2 sm:px-4 text-[8px] sm:text-[10px] text-gray-600 truncate">
-          <div className="flex gap-1 sm:gap-2 border-r border-gray-400 pr-2">
-            <span className="w-12 sm:w-16">X: {mousePos.x.toFixed(0)}</span>
-            <span className="w-12 sm:w-16">Y: {mousePos.y.toFixed(0)}</span>
-            <span className="w-10 sm:w-12 border-l border-gray-400 pl-2">Z: {scale.toFixed(1)}x</span>
-          </div>
-          <div className="hidden sm:flex gap-2 sm:gap-3">
-            <span className="bg-gray-300 px-1 rounded">MODEL</span>
-            <span className="bg-blue-200 text-blue-800 px-1 rounded border border-blue-400">GRID</span>
-            <span className="bg-blue-200 text-blue-800 px-1 rounded border border-blue-400">SNAP</span>
-            <span className="bg-gray-300 px-1 rounded">ORTHO</span>
-          </div>
-        </div>
-      </div>
-
     </main>
   );
 }
