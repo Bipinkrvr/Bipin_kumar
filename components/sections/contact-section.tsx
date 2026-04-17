@@ -9,23 +9,63 @@ export function ContactSection() {
     email: "",
     message: ""
   })
+  
   const [status, setStatus] = useState<"idle" | "handshake" | "encrypting" | "sending" | "success" | "error">("idle")
+  
+  const [hasSent, setHasSent] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // FIX: Reset both memory flags so the terminal clears for a new message!
+    setHasError(false)
+    setHasSent(false) 
+    
     setStatus("handshake")
+    
     setTimeout(() => {
       setStatus("encrypting")
-      setTimeout(() => {
-        setStatus("sending")
+    }, 200)
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "af70aa23-9ff7-4e18-afbe-f8981f63a0ce", 
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
         setTimeout(() => {
-          setStatus("success")
-          setFormData({ name: "", email: "", message: "" })
-          setTimeout(() => setStatus("idle"), 4000)
-        }, 1200)
-      }, 1000)
-    }, 800)
+          setStatus("sending")
+          setTimeout(() => {
+            setStatus("success")
+            setHasSent(true) 
+            setFormData({ name: "", email: "", message: "" }) 
+            
+            setTimeout(() => setStatus("idle"), 2500) 
+          }, 400) 
+        }, 300) 
+      } else {
+        setStatus("error")
+        setHasError(true) 
+        setTimeout(() => setStatus("idle"), 2500)
+      }
+    } catch (error) {
+      setStatus("error")
+      setHasError(true)
+      setTimeout(() => setStatus("idle"), 2500)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -55,7 +95,7 @@ export function ContactSection() {
             <div className="flex items-center gap-2 sm:gap-3">
               <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 animate-pulse" />
               <div>
-                <h2 className="font-mono text-lg sm:text-2xl font-black text-zinc-800 tracking-widest leading-tight">TELEMETRY_UPLINK</h2>
+                <h2 className="font-mono text-lg sm:text-2xl font-black text-zinc-800 tracking-widest leading-tight">CONTACT ME</h2>
                 <p className="font-mono text-[8px] sm:text-[10px] text-amber-600 flex items-center gap-1">
                   <AlertTriangle className="w-2.5 h-2.5" /> SECURE CONNECTION
                 </p>
@@ -72,10 +112,7 @@ export function ContactSection() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 px-1 sm:px-4 pb-1">
               
               <div className="md:col-span-5 flex flex-col gap-2">
-                {/* TERMINAL WINDOW FIX: 
-                  - Switched from min-h-[90px] to a strict fixed h-[110px] on mobile to stop layout jerks.
-                  - Added an absolute bottom-0 wrapper to force old text to slide upwards and hide natively.
-                */}
+                {/* TERMINAL WINDOW */}
                 <div className="bg-zinc-900 border-[3px] border-zinc-300 rounded-md p-2 sm:p-3 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] relative flex flex-col h-[110px] md:h-full shrink-0">
                   <div className="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.1)_1px,transparent_1px)] bg-[size:4px_4px] pointer-events-none"></div>
                   
@@ -84,32 +121,38 @@ export function ContactSection() {
                     <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
                   </div>
 
-                  {/* Absolute positioning anchors text to the bottom. Overflow hidden clips the top. */}
+                  {/* Terminal Text output */}
                   <div className="relative flex-grow z-10 overflow-hidden">
                     <div className="absolute bottom-0 left-0 right-0 flex flex-col justify-end font-mono text-[9px] sm:text-[10px] text-emerald-400 space-y-0.5">
                       <p className="animate-in fade-in slide-in-from-bottom-2 duration-300">{`> AWAITING_PAYLOAD...`}</p>
                       
-                      {status !== "idle" && (
+                      {(status !== "idle" || hasSent || hasError) && (
                         <p className="animate-in fade-in slide-in-from-bottom-2 duration-300">{`> HANDSHAKE... [OK]`}</p>
                       )}
                       
-                      {(status === "encrypting" || status === "sending" || status === "success") && (
+                      {(status === "encrypting" || status === "sending" || status === "success" || hasSent || hasError) && (
                         <p className="text-amber-400 animate-in fade-in slide-in-from-bottom-2 duration-300">{`> RSA_KEYS... [SECURE]`}</p>
                       )}
                       
-                      {(status === "sending" || status === "success") && (
-                        <p className="animate-pulse text-cyan-400 animate-in fade-in slide-in-from-bottom-2 duration-300">{`> TRANSMITTING...`}</p>
+                      {(status === "sending" || status === "success" || hasSent) && !hasError && (
+                        <p className={`text-cyan-400 animate-in fade-in slide-in-from-bottom-2 duration-300 ${status === "sending" ? "animate-pulse" : ""}`}>{`> TRANSMITTING...`}</p>
                       )}
                       
-                      {status === "success" && (
+                      {(status === "success" || hasSent) && (
                         <p className="text-emerald-400 font-bold mt-1 flex items-center gap-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                          <ShieldCheck className="w-3 h-3" /> {`> ACK_RECEIVED`}
+                          <ShieldCheck className="w-3 h-3" /> {`> SUCCESSFUL`}
+                        </p>
+                      )}
+
+                      {(status === "error" || hasError) && (
+                        <p className="text-red-500 font-bold mt-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          {`> TRANSMISSION_FAILED [ERR_500]`}
                         </p>
                       )}
                       
                       <p className="mt-0.5 flex items-center gap-1">
                         <span className="opacity-50">_</span>
-                        {status === "idle" && <span className="animate-pulse bg-emerald-500/50 w-1.5 h-2.5"></span>}
+                        {(status === "idle" || status === "success" || status === "error") && <span className="animate-pulse bg-emerald-500/50 w-1.5 h-2.5"></span>}
                       </p>
                     </div>
                   </div>
@@ -184,7 +227,9 @@ export function ContactSection() {
                   <div className={`absolute inset-0 bg-[repeating-linear-gradient(-45deg,#fbbf24,#fbbf24_15px,#f59e0b_15px,#f59e0b_30px)] transition-opacity duration-300 ${status === "idle" ? "opacity-100" : "opacity-0"}`}></div>
                   <div className="absolute inset-0 bg-white/0 group-hover:bg-white/20 transition-colors duration-300"></div>
                   <div className={`absolute inset-0 bg-cyan-600 transition-opacity duration-300 ${(status === "handshake" || status === "encrypting" || status === "sending") ? "opacity-100" : "opacity-0"}`}></div>
-                  <div className={`absolute inset-0 bg-emerald-500 transition-opacity duration-300 ${status === "success" ? "opacity-100" : "opacity-0"}`}></div>
+                  <div className={`absolute inset-0 bg-emerald-500 transition-opacity duration-300 ${(status === "success" || status === "error") ? "opacity-100" : "opacity-0"}`}></div>
+                  
+                  <div className={`absolute inset-0 bg-red-500 transition-opacity duration-300 ${status === "error" ? "opacity-100" : "opacity-0"}`}></div>
 
                   <div className="relative border-2 border-transparent group-hover:border-white/50 m-1 py-1.5 sm:py-2 px-4 flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm shadow-inner">
                     {status === "idle" && (
@@ -193,7 +238,8 @@ export function ContactSection() {
                     {status === "handshake" && <><Activity className="w-3.5 h-3.5 text-white animate-spin" /> <span className="text-white">HANDSHAKE</span></>}
                     {status === "encrypting" && <><Lock className="w-3.5 h-3.5 text-white animate-pulse" /> <span className="text-white">ENCRYPTING</span></>}
                     {status === "sending" && <><Send className="w-3.5 h-3.5 text-white animate-bounce" /> <span className="text-white">UPLINKING</span></>}
-                    {status === "success" && <><ShieldCheck className="w-3.5 h-3.5 text-white" /> <span className="text-white">SECURE</span></>}
+                    {status === "success" && <><ShieldCheck className="w-3.5 h-3.5 text-white" /> <span className="text-white">SECURED</span></>}
+                    {status === "error" && <><AlertTriangle className="w-3.5 h-3.5 text-white" /> <span className="text-white">FAILED</span></>}
                   </div>
                 </button>
 

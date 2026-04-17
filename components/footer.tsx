@@ -1,15 +1,15 @@
 "use client"
 
-import { Github, Linkedin, Twitter, Mail, Network, Terminal, Activity } from "lucide-react"
+import { Github, Linkedin, Phone, Mail, Network, Terminal, Activity } from "lucide-react"
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const socialPorts = [
-    { name: "GITHUB", label: "GH", icon: Github, link: "https://github.com/bipin-kumar", color: "hover:text-emerald-400 hover:border-emerald-500 text-zinc-400 border-zinc-600" },
-    { name: "LINKEDIN", label: "IN", icon: Linkedin, link: "https://linkedin.com/in/bipin-kumar", color: "hover:text-cyan-400 hover:border-cyan-500 text-zinc-400 border-zinc-600" },
-    { name: "TWITTER", label: "X", icon: Twitter, link: "https://twitter.com/bipin-kumar", color: "hover:text-white hover:border-white text-zinc-400 border-zinc-600" },
-    { name: "MAIL", label: "SMTP", icon: Mail, link: "mailto:your.email@example.com", color: "hover:text-amber-400 hover:border-amber-500 text-zinc-400 border-zinc-600" },
+    { name: "GITHUB", label: "GH", icon: Github, link: "https://github.com/Bipinkrvr", color: "hover:text-emerald-400 hover:border-emerald-500 text-zinc-400 border-zinc-600" },
+    { name: "LINKEDIN", label: "IN", icon: Linkedin, link: "https://www.linkedin.com/in/bipinkrvr/", color: "hover:text-cyan-400 hover:border-cyan-500 text-zinc-400 border-zinc-600" },
+    { name: "PHONE", label: "TEL", icon: Phone, link: "tel:+917209593146", color: "hover:text-white hover:border-white text-zinc-400 border-zinc-600" },
+    { name: "MAIL", label: "SMTP", icon: Mail, link: "mailto:bipinkumarvr@gmail.com", color: "hover:text-amber-400 hover:border-amber-500 text-zinc-400 border-zinc-600" },
   ];
 
   // Helper to generate the silver IC pins
