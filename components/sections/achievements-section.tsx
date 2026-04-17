@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShieldCheck, ExternalLink } from "lucide-react";
@@ -11,88 +11,89 @@ function LogicGateCard({
   subtitle,
   description, 
   tags,
-  link 
+  link,
+  isActive,     // <-- Controlled by parent
+  onToggle      // <-- Tells parent to change state
 }: { 
   title: string, 
   subtitle: string,
   description: string, 
   tags: string[],
-  link?: string 
+  link?: string,
+  isActive: boolean,
+  onToggle: (state: boolean) => void
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  // Tracks if the user has manually tapped the card (null means they haven't tapped it yet)
-  const [isToggled, setIsToggled] = useState<boolean | null>(null);
-  // Tracks if the card has been turned on by the mobile scroll
-  const [isScrolledOn, setIsScrolledOn] = useState(false);
-  
-  const cardRef = useRef<HTMLDivElement>(null);
+  const touchState = useRef({ startY: 0, isScrolling: false });
 
-  useEffect(() => {
-    // 1. DISABLE OBSERVER ON DESKTOP - Desktop will rely purely on hover
-    if (typeof window !== 'undefined' && window.innerWidth >= 768) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // 2. MOBILE SCROLL LOGIC: Turn on when 50% visible on screen
-        if (entry.isIntersecting) {
-          setIsScrolledOn(true);
-        }
-      },
-      { threshold: 0.5 } // Requires 50% of the card to be visible to trigger
-    );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => {
-      if (cardRef.current) observer.unobserve(cardRef.current);
-    };
-  }, []);
-
-  const handleCardClick = () => {
-    // Check what the current state of the card is (either from a previous tap, or the scroll)
-    const currentState = isToggled !== null ? isToggled : isScrolledOn;
-    // Flip that state on tap
-    setIsToggled(!currentState);
+  // 1. Record touch start position
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchState.current.startY = e.touches[0].clientY;
+    touchState.current.isScrolling = false;
   };
 
-  // The card is active if it's hovered (Desktop) OR if it's toggled/scrolled (Mobile)
-  const isActive = isHovered || (isToggled !== null ? isToggled : isScrolledOn);
+  // 2. Turn ON if the user scrolls over this card
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const currentY = e.touches[0].clientY;
+    // If they move their finger more than 10px, it's a scroll
+    if (Math.abs(currentY - touchState.current.startY) > 10) {
+      touchState.current.isScrolling = true;
+      if (!isActive) {
+        onToggle(true);
+      }
+    }
+  };
+
+  // 3. Handle explicit taps
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Prevents the tap from hitting the background click-away listener
+    
+    // Ignore the browser's ghost click if we just finished scrolling
+    if (touchState.current.isScrolling) {
+      touchState.current.isScrolling = false; 
+      return;
+    }
+    
+    // Toggle the card on/off
+    onToggle(!isActive);
+  };
+
+  // The card is active if it's hovered (Desktop) OR if it's selected by the parent (Mobile)
+  const currentlyActive = isHovered || isActive;
 
   return (
     <div 
-      ref={cardRef} 
       className="relative w-full flex flex-col cursor-pointer sm:cursor-default"
-      onMouseEnter={() => setIsHovered(true)}   // Desktop Hover ON
-      onMouseLeave={() => setIsHovered(false)}  // Desktop Hover OFF
-      // REMOVED onTouch events because they conflict with scrolling
-      onClick={handleCardClick}                 // Manual Tap Override
+      onMouseEnter={() => setIsHovered(true)}   
+      onMouseLeave={() => setIsHovered(false)}  
+      onTouchStart={handleTouchStart}           
+      onTouchMove={handleTouchMove}             
+      onClick={handleClick}                     
     >
-      <Card className={`bg-white border-2 transition-all duration-500 rounded-xl overflow-visible flex flex-col h-full ${isActive ? 'border-emerald-400 shadow-[0_10px_30px_rgba(16,185,129,0.15)]' : 'border-zinc-200 shadow-sm'}`}>
+      <Card className={`bg-white border-2 transition-all duration-500 rounded-xl overflow-visible flex flex-col h-full ${currentlyActive ? 'border-emerald-400 shadow-[0_10px_30px_rgba(16,185,129,0.15)]' : 'border-zinc-200 shadow-sm'}`}>
         
         {/* Logic Gate SVG */}
         <div className="absolute top-0 right-4 sm:right-6 -translate-y-1/2 bg-white px-2 z-10 flex items-center scale-[0.75] sm:scale-100 origin-center transition-transform">
           <svg width="60" height="30" viewBox="0 0 75 40" className="overflow-visible">
-            <text x="-5" y="15" className={`text-[10px] font-mono transition-all duration-500 ${isActive ? 'opacity-0 fill-cyan-500' : 'opacity-100 fill-zinc-400'}`}>0</text>
-            <text x="-5" y="15" className={`text-[10px] font-mono transition-all duration-500 fill-cyan-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>1</text>
-            <text x="-5" y="31" className={`text-[10px] font-mono transition-all duration-500 ${isActive ? 'opacity-0 fill-cyan-500' : 'opacity-100 fill-zinc-400'}`}>0</text>
-            <text x="-5" y="31" className={`text-[10px] font-mono transition-all duration-500 fill-cyan-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>1</text>
+            <text x="-5" y="15" className={`text-[10px] font-mono transition-all duration-500 ${currentlyActive ? 'opacity-0 fill-cyan-500' : 'opacity-100 fill-zinc-400'}`}>0</text>
+            <text x="-5" y="15" className={`text-[10px] font-mono transition-all duration-500 fill-cyan-500 ${currentlyActive ? 'opacity-100' : 'opacity-0'}`}>1</text>
+            <text x="-5" y="31" className={`text-[10px] font-mono transition-all duration-500 ${currentlyActive ? 'opacity-0 fill-cyan-500' : 'opacity-100 fill-zinc-400'}`}>0</text>
+            <text x="-5" y="31" className={`text-[10px] font-mono transition-all duration-500 fill-cyan-500 ${currentlyActive ? 'opacity-100' : 'opacity-0'}`}>1</text>
             
-            <line x1="5" y1="12" x2="20" y2="12" className={`stroke-2 transition-colors duration-500 ${isActive ? 'stroke-cyan-400' : 'stroke-zinc-300'}`} />
-            <line x1="5" y1="28" x2="20" y2="28" className={`stroke-2 transition-colors duration-500 ${isActive ? 'stroke-cyan-400' : 'stroke-zinc-300'}`} />
+            <line x1="5" y1="12" x2="20" y2="12" className={`stroke-2 transition-colors duration-500 ${currentlyActive ? 'stroke-cyan-400' : 'stroke-zinc-300'}`} />
+            <line x1="5" y1="28" x2="20" y2="28" className={`stroke-2 transition-colors duration-500 ${currentlyActive ? 'stroke-cyan-400' : 'stroke-zinc-300'}`} />
             
-            <path d="M 20 4 L 30 4 Q 48 4 48 20 Q 48 36 30 36 L 20 36 Z" className={`stroke-2 transition-all duration-500 ${isActive ? 'stroke-emerald-500 fill-emerald-100' : 'stroke-zinc-400 fill-zinc-50'}`} />
+            <path d="M 20 4 L 30 4 Q 48 4 48 20 Q 48 36 30 36 L 20 36 Z" className={`stroke-2 transition-all duration-500 ${currentlyActive ? 'stroke-emerald-500 fill-emerald-100' : 'stroke-zinc-400 fill-zinc-50'}`} />
             
-            <line x1="48" y1="20" x2="65" y2="20" className={`stroke-2 transition-colors duration-500 ${isActive ? 'stroke-emerald-400' : 'stroke-zinc-300'}`} />
+            <line x1="48" y1="20" x2="65" y2="20" className={`stroke-2 transition-colors duration-500 ${currentlyActive ? 'stroke-emerald-400' : 'stroke-zinc-300'}`} />
             
-            <text x="70" y="23" className={`text-[12px] font-mono font-bold transition-colors duration-500 ${isActive ? 'fill-emerald-500' : 'fill-zinc-400'}`}>Q</text>
+            <text x="70" y="23" className={`text-[12px] font-mono font-bold transition-colors duration-500 ${currentlyActive ? 'fill-emerald-500' : 'fill-zinc-400'}`}>Q</text>
           </svg>
         </div>
 
         <CardHeader className="pt-6 sm:pt-8 pb-2 px-5 sm:px-6 shrink-0">
           <div className="font-mono text-[9px] sm:text-[10px] text-emerald-600 tracking-widest mb-1">{subtitle}</div>
-          <CardTitle className={`text-base sm:text-lg font-mono transition-colors duration-300 uppercase leading-tight ${isActive ? 'text-emerald-600' : 'text-zinc-800'}`}>
+          <CardTitle className={`text-base sm:text-lg font-mono transition-colors duration-300 uppercase leading-tight ${currentlyActive ? 'text-emerald-600' : 'text-zinc-800'}`}>
             {title}
           </CardTitle>
         </CardHeader>
@@ -105,7 +106,7 @@ function LogicGateCard({
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mt-auto pt-3 border-t border-zinc-100 shrink-0">
             <div className="flex flex-wrap gap-1.5">
               {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className={`bg-zinc-50 border font-mono text-[9px] sm:text-[10px] px-1.5 py-0 transition-colors ${isActive ? 'border-emerald-300 text-emerald-700' : 'border-zinc-200 text-zinc-600'}`}>
+                <Badge key={tag} variant="secondary" className={`bg-zinc-50 border font-mono text-[9px] sm:text-[10px] px-1.5 py-0 transition-colors ${currentlyActive ? 'border-emerald-300 text-emerald-700' : 'border-zinc-200 text-zinc-600'}`}>
                   {tag}
                 </Badge>
               ))}
@@ -116,7 +117,7 @@ function LogicGateCard({
                 href={link} 
                 target="_blank" 
                 onClick={(e) => e.stopPropagation()} 
-                className={`flex items-center gap-1 font-mono text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded transition-colors shrink-0 ${isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700'}`}
+                className={`flex items-center gap-1 font-mono text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded transition-colors shrink-0 ${currentlyActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700'}`}
               >
                 VERIFY <ExternalLink className="w-3 h-3" />
               </Link>
@@ -129,6 +130,9 @@ function LogicGateCard({
 }
 
 export function AchievementsSection() {
+  // THE BRAIN: Keeps track of WHICH card is currently active (only 1 at a time)
+  const [activeCardTitle, setActiveCardTitle] = useState<string | null>(null);
+
   const credentials = [
     {
       title: "Bronze Winner 🏆",
@@ -175,7 +179,11 @@ export function AchievementsSection() {
   ];
 
   return (
-    <section id="achievements" className="relative w-full flex flex-col justify-center px-4 sm:px-8 py-12 sm:py-20 bg-transparent overflow-visible">
+    <section 
+      id="achievements" 
+      className="relative w-full flex flex-col justify-center px-4 sm:px-8 py-12 sm:py-20 bg-transparent overflow-visible"
+      onClick={() => setActiveCardTitle(null)} // <-- Tapping anywhere OFF the cards turns them all off
+    >
       <div className="max-w-6xl mx-auto w-full flex flex-col">
         
         <div className="flex items-center gap-3 mb-8 border-b border-zinc-200 pb-4 shrink-0 w-full">
@@ -186,14 +194,19 @@ export function AchievementsSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 sm:gap-y-8 w-full">
-          {credentials.map((item, index) => (
+          {credentials.map((item) => (
             <LogicGateCard 
-              key={index}
+              key={item.title} // Used unique title instead of index to prevent React state mix-ups
               title={item.title}
               subtitle={item.subtitle}
               description={item.description}
               tags={item.tags}
               link={item.link}
+              isActive={activeCardTitle === item.title} // Check if this card is the active one
+              onToggle={(state) => {
+                if (state) setActiveCardTitle(item.title); // Turn ON
+                else setActiveCardTitle(null);             // Turn OFF
+              }}
             />
           ))}
         </div>
