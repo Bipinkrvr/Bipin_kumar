@@ -70,9 +70,9 @@ This system is currently undergoing active calibration. The following circuits a
 
 If you are interested in discussing full-stack architecture, IoT automation, AI-assisted development, or electrical engineering, open a communication channel:
 
-* **LinkedIn:** `[Insert Your LinkedIn Profile Link]`
+* **LinkedIn:** `[https://www.linkedin.com/in/bipinkrvr/]`
 * **GitHub:** [@Bipinkrvr](https://github.com/Bipinkrvr)
-* **Email:** `[Insert Your Email Address]`
+* **Email:** `[bipinkumarvr@gmail.com]`
 
 <p align="center">
   <br/>

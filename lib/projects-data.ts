@@ -20,8 +20,8 @@ export const projectsData = [
       techStack: ["C++", "Python", "Jupyter Notebook", "scikit-learn", "pandas"],
       hardware: ["ESP32", "DHT11 Sensor", "L298D Motor Driver", "5V Relay Module", "SSD1306 OLED Display", "Passive Buzzer"],
       media: {
-        images: ["/assets/prj_1/motor-qc-architecture.png", "/assets/prj_1/motor-qc-wiring.png"],
-        video: "https://www.youtube.com/embed/MMl0Gv_sykc?si=f9QX0cwRHIYjwwge"
+        images: ["/assets/prj_1/motor-qc-architecture.png", "/assets/prj_1/motor-qc-wiring.png", "/assets/prj_1/graph.png"],
+        videos: ["https://www.youtube.com/embed/MMl0Gv_sykc?si=f9QX0cwRHIYjwwge"]
       }
     }
   },
@@ -73,8 +73,8 @@ export const projectsData = [
       techStack: ["Python", "Flask", "Termux", "Ubuntu (proot)", "Plotly.js", "Bash"],
       hardware: ["Repurposed Android Smartphone"],
       media: {
-        images: ["/assets/prj_3/architecture.png","/assets/prj_3/screenshot-dashboard.png","/assets/prj_3/screenshot-livedata.png","/assets/prj_3/phone-sensor-dashboard.png"],
-        video: "https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7385323312396128256?compact=1"
+        images: ["/assets/prj_3/device.png","/assets/prj_3/architecture.png","/assets/prj_3/screenshot-dashboard.png","/assets/prj_3/screenshot-livedata.png"],
+        videos: ["https://www.youtube.com/embed/R4PAzLcm0qA?si=olYYoNB0KEcQyb2a","/assets/prj_3/device-demo.mp4"]
       }
     }
   },
@@ -195,7 +195,7 @@ export const projectsData = [
       ],
       techStack: ["React", "Next.js", "Tailwind CSS", "Framer Motion"],
       media: {
-        video: "https://www.youtube.com/embed/R0l2yfxx8eE?si=dv1Qlff6Gsq5tiO9"
+        videos: ["https://www.youtube.com/embed/2PEWKmLkxNs?si=GVs15W7V5nqC7JT5" ,"https://www.youtube.com/embed/sLLG-bbQVD8?si=e-4qwKPL-N8CfLM-"]
       }
     }
   }
