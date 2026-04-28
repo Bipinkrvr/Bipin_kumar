@@ -1,3 +1,6 @@
+/* * © 2026 Bipin Kumar. All Rights Reserved.
+ * This code is proprietary and not licensed for reuse, modification, or distribution.
+ */
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
@@ -6,7 +9,7 @@ import Link from "next/link";
 import { 
   ArrowLeft, FileText, Github, Activity, 
   Terminal, ShieldAlert, Cpu, Settings, ChevronLeft, ChevronRight, Linkedin, Maximize,
-  Zap, CircuitBoard, PlugZap, ExternalLink
+  Zap, CircuitBoard, PlugZap, ExternalLink, RotateCw, Minimize
 } from "lucide-react";
 import { projectsData } from "@/lib/projects-data"; 
 
@@ -19,7 +22,6 @@ const getYouTubeEmbedUrl = (url: string) => {
   return url;
 };
 
-// --- Wires Extended Off-Screen and Heavily Populated Right Side ---
 const CleanWireBackground = () => (
   <div className="fixed top-0 left-0 w-full h-[100svh] pointer-events-none z-0 overflow-hidden bg-[#f4f4f5]">
     <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:32px_32px]"></div>
@@ -62,16 +64,14 @@ export default function SCADAProjectPage() {
   
   const [sysTime, setSysTime] = useState("");
   const [currentMedia, setCurrentMedia] = useState(0);
+  const [isRotated, setIsRotated] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const mediaContainerRef = useRef<HTMLDivElement>(null);
 
-const sortedMediaList = useMemo(() => {
+  const sortedMediaList = useMemo(() => {
     const mediaList: { type: string, url: string }[] = [];
     if (project.details?.media) {
-      
-      // Tell TypeScript to treat media as 'any' to bypass strict checking
       const mediaObj = project.details.media as any;
-      
-      // Now it won't throw an error when looking for 'videos'
       const videoLinks = mediaObj.videos || (mediaObj.video ? [mediaObj.video] : []);
       
       videoLinks.forEach((videoUrl: string) => {
@@ -101,11 +101,31 @@ const sortedMediaList = useMemo(() => {
       const d = new Date();
       setSysTime(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')} IST`);
     }, 1000);
-    return () => clearInterval(interval);
+
+    const handleFullscreenChange = () => {
+      const isFull = !!document.fullscreenElement;
+      setIsFullscreen(isFull);
+      if (!isFull) {
+         setIsRotated(false); 
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
-  const nextMedia = () => setCurrentMedia((prev) => (prev + 1) % Math.max(1, sortedMediaList.length));
-  const prevMedia = () => setCurrentMedia((prev) => (prev - 1 + sortedMediaList.length) % Math.max(1, sortedMediaList.length));
+  const nextMedia = () => {
+    setCurrentMedia((prev) => (prev + 1) % Math.max(1, sortedMediaList.length));
+    // Rotation state is intentionally NOT reset here to keep landscape mode across slides
+  };
+
+  const prevMedia = () => {
+    setCurrentMedia((prev) => (prev - 1 + sortedMediaList.length) % Math.max(1, sortedMediaList.length));
+  };
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -117,7 +137,6 @@ const sortedMediaList = useMemo(() => {
 
   const displayTechStack = project.details?.techStack || project.tags;
 
-  // --- REUSABLE CONNECTIONS BLOCK FOR RESPONSIVE PLACEMENT ---
   const renderExternalConnections = (className: string) => (
     <div className={`bg-zinc-200 border-2 border-zinc-400 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.1)] ${className}`}>
       <h3 className="text-[10px] sm:text-xs font-black tracking-widest text-zinc-600 mb-3 flex items-center gap-2">
@@ -217,7 +236,7 @@ const sortedMediaList = useMemo(() => {
 
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative z-10">
         
-        {/* 2. SCHEMATIC, MEDIA & LINKS (LEFT COLUMN) */}
+        {/* 2. SCHEMATIC, MEDIA & LINKS */}
         <div className="col-span-1 lg:col-span-7 flex flex-col gap-6">
           
           <div className="bg-white border-2 border-zinc-400 p-5 sm:p-7 relative shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
@@ -249,27 +268,70 @@ const sortedMediaList = useMemo(() => {
             <MountingHole className="-bottom-2 -left-2" />
             <MountingHole className="-bottom-2 -right-2" />
 
-            <div className="absolute top-5 left-5 right-5 z-20 flex items-center justify-between pointer-events-none">
-              <div className="flex items-center gap-2 bg-yellow-400 border-2 border-black px-2 py-1 shadow-sm">
-                <ShieldAlert className="w-3 h-3 text-black" />
-                <span className="text-[8px] sm:text-[10px] tracking-widest text-black font-black">
-                  CH_OUT [{sortedMediaList.length > 0 ? currentMedia + 1 : 0}/{sortedMediaList.length}]
-                </span>
-              </div>
-              
-              <button 
-                onClick={toggleFullScreen}
-                className="pointer-events-auto bg-black hover:bg-zinc-800 text-white border-2 border-zinc-600 px-2 py-1 shadow-sm flex items-center gap-1 transition-colors active:scale-95"
-              >
-                <Maximize className="w-3 h-3 text-blue-400" />
-                <span className="text-[8px] sm:text-[10px] font-black tracking-widest hidden sm:inline">MAXIMIZE</span>
-              </button>
-            </div>
-
             <div 
               ref={mediaContainerRef}
               className="relative w-full aspect-video overflow-hidden bg-black border-4 border-zinc-800 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] group/fs flex items-center justify-center"
             >
+              {/* TOP UI OVERLAY */}
+              <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+                <div className="flex items-center gap-2 bg-yellow-400 border-2 border-black px-2 py-1 shadow-sm">
+                  <ShieldAlert className="w-3 h-3 text-black" />
+                  <span className="text-[8px] sm:text-[10px] tracking-widest text-black font-black">
+                    CH_OUT [{sortedMediaList.length > 0 ? currentMedia + 1 : 0}/{sortedMediaList.length}]
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {isFullscreen && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setIsRotated(!isRotated); }}
+                      className="pointer-events-auto bg-black hover:bg-zinc-800 text-white border-2 border-zinc-600 px-2 py-1 shadow-sm flex items-center gap-1 transition-colors active:scale-95"
+                    >
+                      <RotateCw className={`w-3 h-3 text-amber-400 transition-transform duration-300 ${isRotated ? 'rotate-90' : ''}`} />
+                      <span className="text-[8px] font-black tracking-widest hidden sm:inline">ROTATE</span>
+                    </button>
+                  )}
+
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); toggleFullScreen(); }}
+                    className="pointer-events-auto bg-black hover:bg-zinc-800 text-white border-2 border-zinc-600 px-2 py-1 shadow-sm flex items-center gap-1 transition-colors active:scale-95"
+                  >
+                    {isFullscreen ? <Minimize className="w-3 h-3 text-red-400" /> : <Maximize className="w-3 h-3 text-blue-400" />}
+                    <span className="text-[8px] sm:text-[10px] font-black tracking-widest hidden sm:inline">
+                      {isFullscreen ? "MINIMIZE" : "MAXIMIZE"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* PREVIOUS & NEXT ARROWS OVERLAY */}
+              {sortedMediaList.length > 1 && isFullscreen && (
+                <>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); prevMedia(); }}
+                    className={`absolute z-30 pointer-events-auto bg-black/60 hover:bg-black/90 text-white border-2 border-zinc-500 p-1.5 sm:p-2 shadow-lg backdrop-blur-sm transition-all duration-300 active:scale-95 flex items-center justify-center ${
+                      isRotated 
+                        ? 'top-20 left-1/2 -translate-x-1/2 rotate-90 rounded-md sm:rounded-full' 
+                        : 'left-2 sm:left-4 top-1/2 -translate-y-1/2 rounded-md sm:rounded-full'
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-8 sm:h-8" />
+                  </button>
+
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); nextMedia(); }}
+                    className={`absolute z-30 pointer-events-auto bg-black/60 hover:bg-black/90 text-white border-2 border-zinc-500 p-1.5 sm:p-2 shadow-lg backdrop-blur-sm transition-all duration-300 active:scale-95 flex items-center justify-center ${
+                      isRotated 
+                        ? 'bottom-20 left-1/2 -translate-x-1/2 rotate-90 rounded-md sm:rounded-full' 
+                        : 'right-2 sm:right-4 top-1/2 -translate-y-1/2 rounded-md sm:rounded-full'
+                    }`}
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-8 sm:h-8" />
+                  </button>
+                </>
+              )}
+
+              {/* MEDIA CONTENT */}
               {sortedMediaList.length === 0 ? (
                 <div className="flex flex-col items-center justify-center text-zinc-600 animate-pulse">
                   <Activity className="w-12 h-12 mb-2" />
@@ -283,43 +345,46 @@ const sortedMediaList = useMemo(() => {
                       idx === currentMedia ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
                     }`}
                   >
-                    {media.type === "youtube" ? (
-                      <iframe 
-                        src={getYouTubeEmbedUrl(media.url)}
-                        title={`${project.title} YouTube Video`}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="w-full h-full object-cover"
-                      />
-                    ) : media.type === "linkedin" ? (
-                      <iframe 
-                        src={media.url}
-                        title={`${project.title} LinkedIn Video`}
-                        allowFullScreen
-                        className="w-full h-full object-contain"
-                      />
-                    ) : media.type === "video" ? (
-                      <video 
-                        src={media.url} 
-                        autoPlay 
-                        controls
-                        muted 
-                        loop 
-                        playsInline
-                        className="w-full h-full object-contain bg-black"
-                      />
-                    ) : (
-                      <img 
-                        src={media.url} 
-                        alt={`${project.title} media ${idx + 1}`} 
-                        className="w-full h-full object-contain bg-zinc-900"
-                      />
-                    )}
+                    <div className={`w-full h-full flex items-center justify-center transition-all duration-300 ease-in-out ${isRotated ? 'rotate-90 scale-[1.7]' : 'rotate-0 scale-100'}`}>
+                      {media.type === "youtube" ? (
+                        <iframe 
+                          src={getYouTubeEmbedUrl(media.url)}
+                          title={`${project.title} YouTube Video`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full object-cover"
+                        />
+                      ) : media.type === "linkedin" ? (
+                        <iframe 
+                          src={media.url}
+                          title={`${project.title} LinkedIn Video`}
+                          allowFullScreen
+                          className="w-full h-full object-contain"
+                        />
+                      ) : media.type === "video" ? (
+                        <video 
+                          src={media.url} 
+                          autoPlay 
+                          controls
+                          muted 
+                          loop 
+                          playsInline
+                          className="w-full h-full object-contain bg-black"
+                        />
+                      ) : (
+                        <img 
+                          src={media.url} 
+                          alt={`${project.title} media ${idx + 1}`} 
+                          className="w-full h-full object-contain bg-zinc-900"
+                        />
+                      )}
+                    </div>
                   </div>
                 ))
               )}
             </div>
 
+            {/* EXTERNAL PAGINATION */}
             {sortedMediaList.length > 1 && (
               <div className="flex justify-between items-center mt-3 z-20 px-2">
                 <button onClick={prevMedia} className="bg-zinc-100 hover:bg-white border-2 border-zinc-400 p-1.5 shadow-sm active:translate-y-px">
@@ -331,7 +396,10 @@ const sortedMediaList = useMemo(() => {
                   {sortedMediaList.map((_, idx) => (
                     <button 
                       key={idx}
-                      onClick={() => setCurrentMedia(idx)}
+                      onClick={() => {
+                         setCurrentMedia(idx);
+                         setIsRotated(false); 
+                      }}
                       className={`w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-[9px] sm:text-[10px] font-black border-2 transition-all ${
                         idx === currentMedia 
                           ? "bg-amber-400 text-black border-amber-600 shadow-sm" 
@@ -358,7 +426,7 @@ const sortedMediaList = useMemo(() => {
         {/* 3. LOGIC & TERMINALS (RIGHT COLUMN) */}
         <div className="col-span-1 lg:col-span-5 flex flex-col gap-6">
           
-          {/* --- SCROLL-FREE STRUCTURED ABSTRACT SECTION --- */}
+          {/* --- ABSTRACT SECTION --- */}
           <div className="bg-white border-2 border-zinc-400 flex flex-col shadow-[0_8px_30px_rgba(0,0,0,0.05)] relative overflow-hidden">
              <div className="h-8 w-full bg-[repeating-linear-gradient(45deg,#facc15,#facc15_10px,#000_10px,#000_20px)] border-b-2 border-zinc-400 flex items-center justify-center shrink-0">
                 <span className="bg-black px-2 text-[10px] font-black text-yellow-400 tracking-widest">SYSTEM_ABSTRACT & LOGIC</span>

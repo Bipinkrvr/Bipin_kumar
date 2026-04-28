@@ -29,14 +29,12 @@ export function Footer() {
       {/* 1. BREADBOARD GRID & POWER RAILS          */}
       {/* ========================================= */}
       
-      {/* 16px Grid Tie Points */}
+
       <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.35] bg-[radial-gradient(circle_at_center,#52525b_1.5px,transparent_1.5px)] bg-[size:16px_16px]"></div>
       
-      {/* Top Power Rails (16px and 32px from top) */}
       <div className="absolute top-[16px] left-0 w-full h-[3px] bg-red-500/80 z-0 shadow-[0_1px_2px_rgba(239,68,68,0.3)]"></div>
       <div className="absolute top-[32px] left-0 w-full h-[3px] bg-blue-500/80 z-0 shadow-[0_1px_2px_rgba(59,130,246,0.3)]"></div>
       
-      {/* Bottom Power Rails (32px and 16px from bottom) */}
       <div className="absolute bottom-[32px] left-0 w-full h-[3px] bg-blue-500/80 z-0 shadow-[0_1px_2px_rgba(59,130,246,0.3)]"></div>
       <div className="absolute bottom-[16px] left-0 w-full h-[3px] bg-red-500/80 z-0 shadow-[0_1px_2px_rgba(239,68,68,0.3)]"></div>
 
@@ -207,7 +205,6 @@ export function Footer() {
       {/* 3. PLASTIC ENGRAVING (COPYRIGHT)          */}
       {/* ========================================= */}
       <div className="absolute bottom-2 left-0 right-0 w-full flex justify-center z-30 pointer-events-none">
-        {/* CHANGED THIS LINE: Now text-black, font-black, slightly larger, removed mix-blend */}
         <p className="font-mono text-[9px] sm:text-[10px] text-black font-black tracking-[0.2em] text-center uppercase">
           © {currentYear} Bipin Kumar. All Rights Reserved.
         </p>

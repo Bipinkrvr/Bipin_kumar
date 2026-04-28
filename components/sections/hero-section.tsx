@@ -1,3 +1,7 @@
+/* * © 2026 Bipin Kumar. All Rights Reserved.
+ * This code is proprietary and not licensed for reuse, modification, or distribution.
+ */
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,7 +13,6 @@ export function HeroSection() {
   const [isStable, setIsStable] = useState(false);
 
   useEffect(() => {
-    // Reduced calibrating time from 1500ms to 600ms for a snappier boot sequence
     const timer = setTimeout(() => setIsStable(true), 600);
     return () => clearTimeout(timer);
   }, []);
@@ -19,7 +22,7 @@ export function HeroSection() {
       
       <div className="w-full max-w-6xl flex flex-col relative z-10 h-auto sm:h-[85vh]">
         
-        {/* DESKTOP POWER ASSEMBLY (Hidden on Mobile) */}
+        {/* DESKTOP POWER ASSEMBLY (Hiddes in Mobile) */}
         <div className="hidden sm:flex absolute top-[60%] -left-[70px] md:-left-[90px] lg:-left-[120px] flex-row items-center z-[-1] drop-shadow-md">
            
            {/* DC Power Supply Box */}
@@ -74,7 +77,6 @@ export function HeroSection() {
                 </h1>
                 <div className="mt-2 sm:mt-1 flex items-center gap-2 relative z-20 max-w-xl mx-auto w-full px-2">
                    <div className="h-1 flex-grow bg-zinc-200 border border-zinc-300 overflow-hidden">
-                      {/* Reduced animation duration here from 1500ms to 800ms */}
                       <div className={`h-full transition-all duration-[800ms] ease-out ${isStable ? 'bg-cyan-500 w-full shadow-[0_0_8px_rgba(34,211,238,0.5)]' : 'bg-amber-400 w-[20%]'}`}></div>
                    </div>
                    <span className={`font-mono text-[8px] sm:text-[9px] md:text-[10px] uppercase transition-colors duration-300 min-w-[90px] sm:min-w-[120px] text-right shrink-0 whitespace-nowrap ${isStable ? 'text-cyan-600' : 'text-amber-500 animate-pulse'}`}>
@@ -120,7 +122,7 @@ export function HeroSection() {
 
                   <div className="relative w-full h-full bg-zinc-900 overflow-hidden">
                     <Image 
-                      src="/profile.jpg" 
+                      src="/profile.png" 
                       alt="Bipin Kumar, Electrical Engineer and Founder of VyaparLens" 
                       fill
                       priority
@@ -219,7 +221,7 @@ export function HeroSection() {
                   <Link href="#projects" className="flex items-center justify-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-[7px] sm:text-[10px] font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-sm transition-all duration-300 shadow-md">
                     <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> VIEW_PROJECTS
                   </Link>
-                  <Link href="/resume.pdf" target="_blank" className="flex items-center justify-center gap-1.5 bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-600 font-mono text-[7px] sm:text-[10px] font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-sm transition-all duration-300 shadow-sm">
+                  <Link href="/bipin_kumar_resume.pdf" target="_blank" className="flex items-center justify-center gap-1.5 bg-white border border-zinc-300 hover:bg-zinc-50 text-zinc-600 font-mono text-[7px] sm:text-[10px] font-bold px-2 sm:px-3 py-1.5 sm:py-2 rounded-sm transition-all duration-300 shadow-sm">
                     <Database className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> DOWNLOAD_RESUME
                   </Link>
                 </div>

@@ -12,8 +12,8 @@ function LogicGateCard({
   description, 
   tags,
   link,
-  isActive,     // <-- Controlled by parent
-  onToggle      // <-- Tells parent to change state
+  isActive,     
+  onToggle      
 }: { 
   title: string, 
   subtitle: string,
@@ -26,16 +26,15 @@ function LogicGateCard({
   const [isHovered, setIsHovered] = useState(false);
   const touchState = useRef({ startY: 0, isScrolling: false });
 
-  // 1. Record touch start position
+
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchState.current.startY = e.touches[0].clientY;
     touchState.current.isScrolling = false;
   };
 
-  // 2. Turn ON if the user scrolls over this card
+
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     const currentY = e.touches[0].clientY;
-    // If they move their finger more than 10px, it's a scroll
     if (Math.abs(currentY - touchState.current.startY) > 10) {
       touchState.current.isScrolling = true;
       if (!isActive) {
@@ -44,9 +43,8 @@ function LogicGateCard({
     }
   };
 
-  // 3. Handle explicit taps
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation(); // Prevents the tap from hitting the background click-away listener
+    e.stopPropagation();
     
     // Ignore the browser's ghost click if we just finished scrolling
     if (touchState.current.isScrolling) {
@@ -58,7 +56,7 @@ function LogicGateCard({
     onToggle(!isActive);
   };
 
-  // The card is active if it's hovered (Desktop) OR if it's selected by the parent (Mobile)
+
   const currentlyActive = isHovered || isActive;
 
   return (
@@ -182,7 +180,7 @@ export function AchievementsSection() {
     <section 
       id="achievements" 
       className="relative w-full flex flex-col justify-center px-4 sm:px-8 py-12 sm:py-20 bg-transparent overflow-visible"
-      onClick={() => setActiveCardTitle(null)} // <-- Tapping anywhere OFF the cards turns them all off
+      onClick={() => setActiveCardTitle(null)} 
     >
       <div className="max-w-6xl mx-auto w-full flex flex-col">
         
@@ -196,13 +194,13 @@ export function AchievementsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 sm:gap-y-8 w-full">
           {credentials.map((item) => (
             <LogicGateCard 
-              key={item.title} // Used unique title instead of index to prevent React state mix-ups
+              key={item.title} 
               title={item.title}
               subtitle={item.subtitle}
               description={item.description}
               tags={item.tags}
               link={item.link}
-              isActive={activeCardTitle === item.title} // Check if this card is the active one
+              isActive={activeCardTitle === item.title} 
               onToggle={(state) => {
                 if (state) setActiveCardTitle(item.title); // Turn ON
                 else setActiveCardTitle(null);             // Turn OFF

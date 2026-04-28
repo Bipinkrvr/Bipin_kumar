@@ -11,7 +11,7 @@ import { Footer } from "@/components/footer"; // <-- 1. ADDED IMPORT
 
 export default function PortfolioPage() {
   return (
-    // Added flex and flex-col to main so the footer sits correctly at the bottom
+    
     <main className="min-h-screen bg-zinc-50 bg-[linear-gradient(to_right,rgba(34,197,94,0.25)_1px,transparent_1px),linear-gradient(to_bottom,rgba(34,197,94,0.25)_1px,transparent_1px)] bg-[size:14px_24px] text-zinc-900 font-sans selection:bg-cyan-500/30 flex flex-col">
       
       <NavBar /> 
@@ -28,7 +28,7 @@ export default function PortfolioPage() {
         <ContactSection />
       </div>
 
-      <Footer /> {/* <-- 2. ADDED FOOTER COMPONENT */}
+      <Footer />
     </main>
   );
 }

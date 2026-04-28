@@ -12,7 +12,7 @@ export function ExperienceSection() {
     {
       id: "EXP_01",
       role: "Founder & AI-Assisted Developer",
-      company: "VyaparLens",
+      company: "VyaparLens (comming soon in playstore)",
       timeline: "[TIMESTAMPS: JAN_2026 - PRESENT]",
       bullets: [
         "Architecting an AI-powered marketing application for small business owners, prioritizing strict user data privacy via on-device AI.",

@@ -53,7 +53,6 @@ export function NavBar() {
     }
   };
 
-  // 1 & 2. Simplified Nav Links & Added Internship
   const navLinks = [
     { name: "HOME", href: "#hero" },
     { name: "EXPERIENCE", href: "#experience" }, 
@@ -135,7 +134,7 @@ export function NavBar() {
 
               {/* Resume Button: IC Chip */}
               <a 
-                href="/resume.pdf" 
+                href="/bipin_kumar_resume.pdf" 
                 target="_blank" 
                 className="flex items-center gap-1.5 bg-zinc-900 px-3 py-2 border-2 border-zinc-700 rounded-sm shadow-[0_4px_10px_rgba(0,0,0,0.3)] hover:border-cyan-500 transition-colors group shrink-0 relative"
               >

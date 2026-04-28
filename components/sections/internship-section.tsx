@@ -260,14 +260,12 @@ function ControlLoopInternship({ data }: { data: typeof internshipData[0] }) {
                   <div className={`absolute top-0 bottom-1/2 -right-[40px] w-[2px] translate-x-1/2 transition-colors duration-500 z-0 ${wireBg}`}></div>
                   <div className={`absolute top-1/2 -translate-y-1/2 -right-[40px] w-2.5 h-2.5 rounded-full translate-x-1/2 transition-colors duration-500 z-20 ${takeoffBg}`}></div>
                   
-                  {/* If more than 3 blocks somehow exist, continue the pass-down */}
                   {!isLast && (
                     <div className={`absolute top-1/2 bottom-[-20px] -right-[40px] w-[2px] translate-x-1/2 transition-colors duration-500 z-0 ${wireBg}`}></div>
                   )}
                 </>
               )}
 
-              {/* Box UI - Increased Padding for H(s) */}
               <div className={`w-full bg-white border-2 p-4 transition-colors duration-300 relative z-10 min-h-[70px] flex flex-col justify-center ${isActive ? nodeBorder : 'border-zinc-200'}`}>
                 <span className={`absolute left-2 -top-[7px] text-[9px] font-bold bg-white px-1 tracking-widest ${textActive}`}>
                   H_{index + 1}(s) SENSOR

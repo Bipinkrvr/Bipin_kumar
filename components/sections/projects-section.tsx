@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion, Variants } from "framer-motion"; 
 import { projectsData } from "@/lib/projects-data"; 
 
-// --- NEW: Tracker to prevent re-animation on navigation ---
+// --- Tracker to prevent re-animation on navigation ---
 let hasPlayedAnimation = false;
 
 export function ProjectsSection() {
@@ -97,7 +97,6 @@ export function ProjectsSection() {
         </div>
 
         {/* --- UPDATED MOTION.DIV --- */}
-        {/* If hasPlayedAnimation is true, skip the "hidden" state and jump straight to "show" */}
         <motion.div 
           variants={containerVariants}
           initial={hasPlayedAnimation ? "show" : "hidden"}

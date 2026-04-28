@@ -18,7 +18,7 @@ export function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // FIX: Reset both memory flags so the terminal clears for a new message!
+   
     setHasError(false)
     setHasSent(false) 
     
